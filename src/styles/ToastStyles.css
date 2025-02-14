@@ -1,0 +1,16 @@
+/* ToastStyles.css */
+.custom-toast {
+    background-color: #4caf50; /* Green background for success */
+    color: white; 
+    border-radius: 5px; 
+    padding: 10px; 
+    font-size: 16px; 
+  }
+  
+  .custom-toast-error {
+    background-color: #ac2920; 
+  }
+  
+  .custom-toast-warning {
+    background-color: #ff9800; 
+  }
