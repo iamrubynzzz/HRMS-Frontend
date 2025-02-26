@@ -22,7 +22,7 @@
 .login-image {
   flex: 1;
   padding: 20px;
-  background-color: #45AAD3; /* Matching background color */
+  background-color: #45AAD3; 
 }
 
 .login-image img {
@@ -79,8 +79,8 @@
     appearance: none; /* Hides the default  dropdown  */
     width: 388px;
     background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23000000"%3E%3Cpath d="M7 10l5 5 5-5H7z"/%3E%3C/svg%3E') no-repeat right 10px center;
-    background-color: #fff; /* Dropdown background */
-    background-size: 2.5rem; /* Increase the size of the dropdown arrow */
+    background-color: #fff; 
+    background-size: 2.5rem;
 }
 
 input,

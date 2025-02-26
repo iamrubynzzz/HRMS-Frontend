@@ -50,15 +50,10 @@ const LoginPage = () => {
       if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
         localStorage.setItem("userRole", formData.role);
-        
-        if (formData.role === "admin") {
-          navigate('/admin-dashboard');
-        } else if (formData.role === "manager") {
-          navigate('/manager-dashboard');
-        } else {
-          navigate('/employee-dashboard');
-        }
-      }
+    
+  
+        navigate('/admin-dashboard');
+    }
     } catch (error) {
       console.error("Login failed:", error);
   

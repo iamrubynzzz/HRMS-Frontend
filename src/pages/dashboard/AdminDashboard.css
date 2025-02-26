@@ -1,0 +1,21 @@
+/* AdminDashboard.css */
+.admin-dashboard {
+    display: flex;
+    flex-direction: column; 
+    min-height: 100vh; 
+  }
+
+  
+  .admin-dashboard-content {
+    flex: 1; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    padding: 20px; 
+  }
+  
+  .content-inner {
+    max-width: 800px; 
+    width: 100%; 
+    text-align: center; 
+  }

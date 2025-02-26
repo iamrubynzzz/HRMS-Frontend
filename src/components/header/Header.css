@@ -1,0 +1,74 @@
+/* Header.css */
+
+.header-container {
+    background-color: #4a90b1; 
+    padding: 10px 20px; 
+    height: 80px;
+    min-width: 100vw;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    left: 0;
+    top: 0;
+  }
+  
+  .header {
+    display: flex; 
+    align-items: center; 
+    flex-shrink: 0;
+    justify-content: space-between; 
+  }
+  
+  .header-logo-container {
+    display: flex; 
+    align-items: center; 
+    margin-left: 80px;
+  }
+  
+  .header-logo {
+    width: 40px; 
+    height: auto; 
+    margin-right: 10px; 
+  }
+  
+  .header-company-name {
+    font-size: 1.5rem; 
+    color: #333;;
+  }
+  
+  .header-search-container {
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    margin-right:0px; 
+  }
+  
+  .header-search-box {
+    position: relative;
+    display: flex; 
+    align-items: center;
+  }
+  
+  .header-search-input {
+    width: 100%;
+    padding: 10px 35px 10px 10px;
+    border: 1px solid #ccc; 
+    border-radius: 20px; 
+    outline: none; 
+  }
+  
+  .header-search-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #888;
+  }
+
+  .header-notification-icon {
+    font-size: 1.5rem; 
+    margin-right: 50px; 
+    cursor: pointer; 
+  }
+  

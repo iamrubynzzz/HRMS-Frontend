@@ -1,12 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Header from '../../components/header/Header';
+import Sidebar from '../../components/Sidebar/Sidebar';
+import AttendancePage from '../../pages/AttendancePage/Attendance';
+import UserPage from '../../pages/UserManagement/Users';
+import RequestPage from '../Request/RequestPage';
+import './AdminDashboard.css';
 
+const AdminDashboard = () => {
+  const [activeSection, setActiveSection] = useState('dashboard');
 
-const AdminWelcomePage = () => {
   return (
-    <div className="admin-welcome-container">
-      
+    <div className="admin-dashboard">
+      <Header />
+      <div className="main-content">
+        <Sidebar setActiveSection={setActiveSection} />
+        <div className="content">
+          {activeSection === 'byDate' && <AttendancePage activeSubSection="byDate" />}
+          {activeSection === 'byRange' && <AttendancePage activeSubSection="byRange" />}
+          {activeSection === 'byStatus' && <AttendancePage activeSubSection="byStatus" />}
+          {activeSection === 'users' && <UserPage />}
+          {activeSection === 'request' && <RequestPage />}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default AdminWelcomePage;
+export default AdminDashboard;
