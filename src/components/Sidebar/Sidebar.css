@@ -1,0 +1,72 @@
+/* Sidebar container styling */
+.sidebar-container {
+    margin-top: 100px;
+    width: 250px;
+    height: 100vh;
+    background-color: #4a90b1;  
+    color: black;
+    padding-top: 20px;
+    position: fixed;
+    left: 0;
+    top: 0;
+  }
+  
+  
+  .sidebar-items {
+    flex-grow: 1;
+  }
+  
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    margin: 8px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .sidebar-icon {
+    margin-right: 20px; 
+    font-size: 1.3rem; 
+  }
+  
+  
+  .sidebar-item:hover {
+    background-color: #2f7a97;
+    color: white;
+  }
+  
+  .sidebar-item.active {
+    background-color: #236178;
+    font-weight: bold;
+    color: white;
+  }
+
+  /* Sub-items (Approvals: Pending, Approved, Rejected) */
+.sidebar-sub-items {
+  margin-left: 20px; /* Indent sub-items */
+  padding-left: 15px;
+  border-left: 3px solid #236178; /* Line to indicate nesting */
+}
+
+.sidebar-sub-item {
+  padding: 8px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-sub-item:hover {
+  background-color: #2f7a97;
+  color: white;
+}
+
+.sidebar-sub-item.active {
+  background-color: #236178;
+  font-weight: bold;
+  color: white;
+}
+
+  
+
+  
