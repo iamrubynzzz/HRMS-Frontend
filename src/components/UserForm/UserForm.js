@@ -129,48 +129,53 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
     if (!isValid) return; // Stop submission if there are errors
   
     try {
-      console.log("==================111111111");
-      await onSubmit(formData); // Call the onSubmit prop (handles API request)
+      await onSubmit(formData); // Call the onSubmit prop (handles Add or Update API request)
       setErrorMessage(''); // Clear any remaining error message on success
     } catch (error) {
-      console.log("==================111111111");
-      console.log('Error caught in handleSubmit:', error); // Debugging
+      console.log('Error caught in handleSubmit:', error);
       if (error.response) {
         // Handle backend validation errors
         const { status, data } = error.response;
-        console.log('Backend Error Response:', { status, data }); // Debugging
-  
+        console.log('Backend Error Response:', { status, data }); 
         if (status === 400) {
-          // Handle BAD_REQUEST errors (e.g., missing leave balances)
+          // Handle BAD_REQUEST errors (e.g., missing leave balances, invalid manager ID)
           setErrors((prev) => ({
             ...prev,
             annualLeaveBalance: data.message.includes("Annual Leave Balance") ? data.message : '',
             sickLeaveBalance: data.message.includes("Sick Leave Balance") ? data.message : '',
+            managerId: data.message.includes("Manager ID") ? data.message : '',
           }));
         } else if (status === 403) {
-          // Handle FORBIDDEN errors (e.g., invalid role)
+          // FORBIDDEN errors ( invalid role)
           setErrors((prev) => ({
             ...prev,
             role: data.message,
           }));
         } else if (status === 404) {
-          // Handle NOT_FOUND errors (e.g., manager not found)
+          //  NOT_FOUND errors (manager not found)
           setErrors((prev) => ({
             ...prev,
             managerId: data.message,
           }));
         } else if (status === 409) {
-          // Handle CONFLICT errors (e.g., RFID conflict)
-          console.log('Setting RFID error:', data.message); // Debugging
+          // CONFLICT errors ( RFID conflict)
           setErrors((prev) => ({
             ...prev,
             rfid: data.message, // Set the error message for the RFID field
           }));
-          setTouched((prev) => ({ ...prev, rfid: true })); // Force display the error
         } else {
           // Handle other errors
           setErrorMessage(data.message || 'An unexpected error occurred. Please try again.');
         }
+  
+        // Display the error messages for the relevant fields
+        setTouched((prev) => ({
+          ...prev,
+          annualLeaveBalance: true,
+          sickLeaveBalance: true,
+          managerId: true,
+          rfid: true,
+        }));
       } else {
         // Handle network or other errors
         setErrorMessage('An error occurred while submitting the form. Please check your connection.');
