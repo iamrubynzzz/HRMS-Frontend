@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Header from '../../components/header/Header';
 import Sidebar from '../../components/Sidebar/Sidebar';
-import AttendancePage from '../../pages/AttendancePage/Attendance';
+//import AttendancePage from '../../pages/AttendancePage/Attendance';
 import UserPage from '../../pages/UserManagement/Users';
-import RequestPage from '../Request/RequestPage';
+//import RequestPage from '../Request/RequestPage';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -15,11 +15,11 @@ const AdminDashboard = () => {
       <div className="main-content">
         <Sidebar setActiveSection={setActiveSection} />
         <div className="content">
-          {activeSection === 'byDate' && <AttendancePage activeSubSection="byDate" />}
+        {/*  {activeSection === 'byDate' && <AttendancePage activeSubSection="byDate" />}
           {activeSection === 'byRange' && <AttendancePage activeSubSection="byRange" />}
-          {activeSection === 'byStatus' && <AttendancePage activeSubSection="byStatus" />}
+          {activeSection === 'byStatus' && <AttendancePage activeSubSection="byStatus" />}*/}
           {activeSection === 'users' && <UserPage />}
-          {activeSection === 'request' && <RequestPage />}
+         {/* {activeSection === 'request' && <RequestPage />}*/}
         </div>
       </div>
     </div>
