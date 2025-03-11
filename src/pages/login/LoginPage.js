@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./LoginPage.css";
 import Button from "../../components/common/Button";
 import UsePasswordToggle from "../../hooks/UsePasswordToggle";
@@ -15,9 +15,25 @@ const LoginPage = () => {
     email: "",
     password: "",
     role: "",
+    companyName: "",
   });
   const [loading, setLoading] = useState(false); // Loading state
+  const [companies, setCompanies] = useState([]); // State to store companies
   const navigate = useNavigate();
+
+  // Fetch companies on component mount
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await axios.get("/api/companies");
+        setCompanies(response.data);
+      } catch (error) {
+        console.error("Failed to fetch companies:", error);
+      }
+    };
+
+    fetchCompanies();
+  }, []);
 
   // handleChange function
   const handleChange = (e) => {
@@ -38,6 +54,14 @@ const LoginPage = () => {
       return;
     }
 
+    // If role is not SUPER_ADMIN, company name is required
+    if (formData.role !== "SUPER_ADMIN" && !formData.companyName) {
+      toast.error("Company name is required for login.", {
+        className: 'custom-toast-error',
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -50,13 +74,11 @@ const LoginPage = () => {
       if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
         localStorage.setItem("userRole", formData.role);
-    
-  
         navigate('/admin-dashboard');
-    }
+      }
     } catch (error) {
       console.error("Login failed:", error);
-  
+
       if (error.response && error.response.data) {
         toast.error(error.response.data.message || "Invalid email or password.", {
           className: 'custom-toast-error',
@@ -120,12 +142,37 @@ const LoginPage = () => {
               >
                 <option value="" disabled>
                   Select your role
-                </option ><option value="user">Employee</option>
-                <option value="manager">Manager</option>
+                </option>
+                <option value="SUPER_ADMIN">Super Admin</option>
                 <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+                <option value="employee">Employee</option>
               </select>
             </div>
           </div>
+          {formData.role !== "SUPER_ADMIN" && (
+            <div className="form-group">
+              <label htmlFor="companyName">Company</label>
+              <div className="role-select-container">
+                <select
+                  id="companyName"
+                  name="companyName" 
+                  className="role-select"
+                  value={formData.companyName}
+                  onChange={handleChange}
+                >
+                  <option value="" disabled>
+                    Select your company
+                  </option>
+                  {companies.map((company) => (
+                    <option key={company.id} value={company.name.trim()}>
+                      {company.name.trim()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
           <div className="form-footer">
             <a href="/forgot-password" className="forgot-password">
               Forgot Password?

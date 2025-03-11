@@ -1,0 +1,41 @@
+.admin-leave-page {
+    padding: 20px;
+    margin-top: 150px; 
+    margin-left: 260px;
+    background-color: #f4f4f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100vw;
+    max-width: 1150px;
+    max-height: calc(100vh - 200px); 
+    overflow-y: auto; 
+  }
+  
+  .employees-table {
+    width: 100%;
+    margin-top: 20px;
+    overflow-x: auto;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  table th,
+  table td {
+    padding: 12px; 
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  table th {
+    background-color: rgb(210, 207, 207);
+    color: black;
+    font-weight: bold;
+    padding: 16px; 
+    text-align: left;
+  }
+  

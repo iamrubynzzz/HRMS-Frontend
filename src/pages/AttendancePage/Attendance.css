@@ -1,0 +1,118 @@
+/* Container for the entire attendance page */
+.attendance-page {
+  padding: 20px;
+  margin-top: 150px; 
+  margin-left: 260px;
+  background-color: #f4f4f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100vw; 
+  max-width: 1150px; 
+}
+
+/* Filters section */
+.filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* Filter item styling */
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-item input {
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 200px;
+  outline: none;
+}
+
+.filter-item input:focus {
+  border-color: #45aad3;
+}
+
+/* Table styling */
+.attendance-table {
+  width: 100%;
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: rgb(210, 207, 207);
+  color: black;
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Loading state text */
+.loading {
+  font-size: 16px;
+  color: #777;
+  text-align: center;
+}
+
+body {
+  margin: 0; 
+  padding: 0; 
+  display: flex;
+  justify-content: center; 
+  align-items: flex-start; 
+  min-height: 100vh; 
+  background-color: #e9ecef; 
+}
+
+/* Pagination controls */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.pagination span {
+  font-size: 14px;
+  font-weight: bold;
+}

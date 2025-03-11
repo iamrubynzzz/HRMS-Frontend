@@ -58,27 +58,6 @@ const handleSectionClick = (section) => {
           onClick={() => handleSectionClick('attendance')} 
         />
 
-        {/* Sub-sections for Attendance */}
-        {showAttendanceSubItems && (
-          <div className="sidebar-sub-items">
-            <SidebarSubItem 
-              label="By Date" 
-              active={activeSubSection === 'byDate'} 
-              onClick={() => handleSubSectionClick('byDate')} 
-            />
-            <SidebarSubItem 
-              label="By Range" 
-              active={activeSubSection === 'byRange'} 
-              onClick={() => handleSubSectionClick('byRange')} 
-            />
-            <SidebarSubItem 
-              label="By Status" 
-              active={activeSubSection === 'byStatus'} 
-              onClick={() => handleSubSectionClick('byStatus')} 
-            />
-          </div>
-        )}
-
         <SidebarItem 
           icon={<FaFileInvoiceDollar />} 
           label="Payroll" 
@@ -87,7 +66,7 @@ const handleSectionClick = (section) => {
         />
         <SidebarItem 
           icon={<FaRegCalendarCheck />} 
-          label="Leave Management" 
+          label="Leave" 
           active={active === 'leave'} 
           onClick={() => handleSectionClick('leave')} 
         />
