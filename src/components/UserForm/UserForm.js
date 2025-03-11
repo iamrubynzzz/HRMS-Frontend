@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Button from '../../components/common/Button';
 import './UserForm.css';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErrorMessage }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
     role: 'EMPLOYEE',
     rfid: '',
     address: '',
@@ -19,11 +20,29 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
     annualLeaveBalance: 0,
     sickLeaveBalance: 0,
     managerId: '',
+    companyName: '',
     ...initialValues,
   });
 
   const [errors, setErrors] = useState({});
-  const [touched, setTouched] = useState({}); // Track touched fields
+  const [touched, setTouched] = useState({});
+  const [companies, setCompanies] = useState([]); // State for company dropdown
+  const [isSubmitting, setIsSubmitting] = useState(false); // Prevent double submission
+
+  // Fetch companies for the dropdown
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await axios.get('/api/companies'); // Adjust the API endpoint as needed
+        setCompanies(response.data);
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+        toast.error('Failed to fetch companies. Please try again.');
+      }
+    };
+
+    fetchCompanies();
+  }, []);
 
   useEffect(() => {
     setFormData((prev) => ({ ...prev, ...initialValues }));
@@ -33,12 +52,10 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear error when the user types in a field
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
 
-    // Clear the global error message when the user starts typing
     if (errorMessage) {
       setErrorMessage('');
     }
@@ -46,8 +63,8 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
 
   const handleBlur = (e) => {
     const { name } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true })); // Mark the field as touched
-    validateField(name); // Validate the field when the user leaves it
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    validateField(name);
   };
 
   const validateField = (fieldName) => {
@@ -60,9 +77,6 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
         break;
       case 'email':
         if (!value.trim()) error = 'Email is required.';
-        break;
-      case 'password':
-        if (!value.trim() && mode === 'add') error = 'Password is required.';
         break;
       case 'rfid':
         if (!value.trim()) error = 'RFID is required.';
@@ -89,13 +103,16 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
         if (!value || value <= 0) error = 'Salary must be a positive number.';
         break;
       case 'annualLeaveBalance':
-        if (value < 0) error = 'Annual Leave Balance cannot be negative.';
+        if (formData.role !== 'ADMIN' && value < 0) error = 'Annual Leave Balance cannot be negative.';
         break;
       case 'sickLeaveBalance':
-        if (value < 0) error = 'Sick Leave Balance cannot be negative.';
+        if (formData.role !== 'ADMIN' && value < 0) error = 'Sick Leave Balance cannot be negative.';
         break;
       case 'managerId':
-        if (formData.role === 'EMPLOYEE' && !value) error = 'Manager ID is required for Employees.';
+        if (formData.role !== 'ADMIN' && !value) error = 'Manager ID is required.';
+        break;
+      case 'companyName':
+        if (formData.role === 'ADMIN' && !value) error = 'Company Name is required for Admins.';
         break;
       default:
         break;
@@ -107,7 +124,6 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
   const validateForm = () => {
     const newErrors = {};
 
-    // Validate all fields
     Object.keys(formData).forEach((fieldName) => {
       validateField(fieldName);
       if (errors[fieldName]) {
@@ -115,30 +131,31 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
       }
     });
 
-    return Object.keys(newErrors).length === 0; // Return true if no errors
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Clear the global error message before submission
+
+    if (isSubmitting) return; // Prevent double submission
+    setIsSubmitting(true);
+
     setErrorMessage('');
-  
-    // Validate the form
+
     const isValid = validateForm();
-    if (!isValid) return; // Stop submission if there are errors
-  
+    if (!isValid) {
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      await onSubmit(formData); // Call the onSubmit prop (handles Add or Update API request)
-      setErrorMessage(''); // Clear any remaining error message on success
+      await onSubmit(formData);
+      toast.success(`User ${mode === 'add' ? 'created' : 'updated'} successfully!`);
+      onClose();
     } catch (error) {
-      console.log('Error caught in handleSubmit:', error);
       if (error.response) {
-        // Handle backend validation errors
         const { status, data } = error.response;
-        console.log('Backend Error Response:', { status, data }); 
         if (status === 400) {
-          // Handle BAD_REQUEST errors (e.g., missing leave balances, invalid manager ID)
           setErrors((prev) => ({
             ...prev,
             annualLeaveBalance: data.message.includes("Annual Leave Balance") ? data.message : '',
@@ -146,40 +163,28 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
             managerId: data.message.includes("Manager ID") ? data.message : '',
           }));
         } else if (status === 403) {
-          // FORBIDDEN errors ( invalid role)
           setErrors((prev) => ({
             ...prev,
             role: data.message,
           }));
         } else if (status === 404) {
-          //  NOT_FOUND errors (manager not found)
           setErrors((prev) => ({
             ...prev,
             managerId: data.message,
           }));
         } else if (status === 409) {
-          // CONFLICT errors ( RFID conflict)
           setErrors((prev) => ({
             ...prev,
-            rfid: data.message, // Set the error message for the RFID field
+            rfid: data.message,
           }));
         } else {
-          // Handle other errors
           setErrorMessage(data.message || 'An unexpected error occurred. Please try again.');
         }
-  
-        // Display the error messages for the relevant fields
-        setTouched((prev) => ({
-          ...prev,
-          annualLeaveBalance: true,
-          sickLeaveBalance: true,
-          managerId: true,
-          rfid: true,
-        }));
       } else {
-        // Handle network or other errors
         setErrorMessage('An error occurred while submitting the form. Please check your connection.');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -229,23 +234,52 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
             )}
           </div>
 
-          {/* Password Field (only for add mode) */}
-          {mode === 'add' && (
+          {/* Role Field */}
+          <div className="form-row">
+            <label htmlFor="role">Role:</label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className={errors.role ? 'error-input' : ''}
+              aria-describedby="role-error"
+            >
+              <option value="EMPLOYEE">Employee</option>
+              <option value="MANAGER">Manager</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+            {touched.role && errors.role && (
+              <p id="role-error" className="error-message" aria-live="polite">
+                {errors.role}
+              </p>
+            )}
+          </div>
+
+          {/* Company Name Field (only for ADMIN role) */}
+          {formData.role === 'ADMIN' && (
             <div className="form-row">
-              <label htmlFor="password">Password:</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
+              <label htmlFor="companyName">Company Name:</label>
+              <select
+                id="companyName"
+                name="companyName"
+                value={formData.companyName}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={errors.password ? 'error-input' : ''}
-                aria-describedby="password-error"
-              />
-              {touched.password && errors.password && (
-                <p id="password-error" className="error-message" aria-live="polite">
-                  {errors.password}
+                className={errors.companyName ? 'error-input' : ''}
+                aria-describedby="companyName-error"
+              >
+                <option value="">Select Company</option>
+                {companies.map((company) => (
+                  <option key={company.id} value={company.name}>
+                    {company.name}
+                  </option>
+                ))}
+              </select>
+              {touched.companyName && errors.companyName && (
+                <p id="companyName-error" className="error-message" aria-live="polite">
+                  {errors.companyName}
                 </p>
               )}
             </div>
@@ -267,108 +301,6 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
             {touched.rfid && errors.rfid && (
               <p id="rfid-error" className="error-message" aria-live="polite">
                 {errors.rfid}
-              </p>
-            )}
-          </div>
-
-          {/* Role Field */}
-          <div className="form-row">
-            <label htmlFor="role">Role:</label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              className={errors.role ? 'error-input' : ''}
-              aria-describedby="role-error"
-            >
-              <option value="EMPLOYEE">Employee</option>
-              <option value="MANAGER">Manager</option>
-            </select>
-            {touched.role && errors.role && (
-              <p id="role-error" className="error-message" aria-live="polite">
-                {errors.role}
-              </p>
-            )}
-          </div>
-
-          {/* Salary Field */}
-          <div className="form-row">
-            <label htmlFor="salary">Salary:</label>
-            <input
-              type="number"
-              id="salary"
-              name="salary"
-              value={formData.salary}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              className={errors.salary ? 'error-input' : ''}
-              aria-describedby="salary-error"
-            />
-            {touched.salary && errors.salary && (
-              <p id="salary-error" className="error-message" aria-live="polite">
-                {errors.salary}
-              </p>
-            )}
-          </div>
-
-          {/* Annual Leave Balance Field */}
-          <div className="form-row">
-            <label htmlFor="annualLeaveBalance">Annual Leave Balance:</label>
-            <input
-              type="number"
-              id="annualLeaveBalance"
-              name="annualLeaveBalance"
-              value={formData.annualLeaveBalance}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              className={errors.annualLeaveBalance ? 'error-input' : ''}
-              aria-describedby="annualLeaveBalance-error"
-            />
-            {touched.annualLeaveBalance && errors.annualLeaveBalance && (
-              <p id="annualLeaveBalance-error" className="error-message" aria-live="polite">
-                {errors.annualLeaveBalance}
-              </p>
-            )}
-          </div>
-
-          {/* Sick Leave Balance Field */}
-          <div className="form-row">
-            <label htmlFor="sickLeaveBalance">Sick Leave Balance:</label>
-            <input
-              type="number"
-              id="sickLeaveBalance"
-              name="sickLeaveBalance"
-              value={formData.sickLeaveBalance}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              className={errors.sickLeaveBalance ? 'error-input' : ''}
-              aria-describedby="sickLeaveBalance-error"
-            />
-            {touched.sickLeaveBalance && errors.sickLeaveBalance && (
-              <p id="sickLeaveBalance-error" className="error-message" aria-live="polite">
-                {errors.sickLeaveBalance}
-              </p>
-            )}
-          </div>
-
-          {/* Manager ID Field */}
-          <div className="form-row">
-            <label htmlFor="managerId">Manager ID:</label>
-            <input
-              type="text"
-              id="managerId"
-              name="managerId"
-              value={formData.managerId}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              className={errors.managerId ? 'error-input' : ''}
-              aria-describedby="managerId-error"
-            />
-            {touched.managerId && errors.managerId && (
-              <p id="managerId-error" className="error-message" aria-live="polite">
-                {errors.managerId}
               </p>
             )}
           </div>
@@ -476,13 +408,100 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
             )}
           </div>
 
+          {/* Salary Field */}
+          <div className="form-row">
+            <label htmlFor="salary">Salary:</label>
+            <input
+              type="number"
+              id="salary"
+              name="salary"
+              value={formData.salary}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className={errors.salary ? 'error-input' : ''}
+              aria-describedby="salary-error"
+            />
+            {touched.salary && errors.salary && (
+              <p id="salary-error" className="error-message" aria-live="polite">
+                {errors.salary}
+              </p>
+            )}
+          </div>
+
+          {/* Annual Leave Balance Field (only for EMPLOYEE and MANAGER roles) */}
+          {formData.role !== 'ADMIN' && (
+            <div className="form-row">
+              <label htmlFor="annualLeaveBalance">Annual Leave Balance:</label>
+              <input
+                type="number"
+                id="annualLeaveBalance"
+                name="annualLeaveBalance"
+                value={formData.annualLeaveBalance}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={errors.annualLeaveBalance ? 'error-input' : ''}
+                aria-describedby="annualLeaveBalance-error"
+              />
+              {touched.annualLeaveBalance && errors.annualLeaveBalance && (
+                <p id="annualLeaveBalance-error" className="error-message" aria-live="polite">
+                  {errors.annualLeaveBalance}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Sick Leave Balance Field (only for EMPLOYEE and MANAGER roles) */}
+          {formData.role !== 'ADMIN' && (
+            <div className="form-row">
+              <label htmlFor="sickLeaveBalance">Sick Leave Balance:</label>
+              <input
+                type="number"
+                id="sickLeaveBalance"
+                name="sickLeaveBalance"
+                value={formData.sickLeaveBalance}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={errors.sickLeaveBalance ? 'error-input' : ''}
+                aria-describedby="sickLeaveBalance-error"
+              />
+              {touched.sickLeaveBalance && errors.sickLeaveBalance && (
+                <p id="sickLeaveBalance-error" className="error-message" aria-live="polite">
+                  {errors.sickLeaveBalance}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Manager ID Field (for Employee and Manager roles) */}
+          {formData.role !== 'ADMIN' && (
+            <div className="form-row">
+              <label htmlFor="managerId">Manager ID:</label>
+              <input
+                type="text"
+                id="managerId"
+                name="managerId"
+                value={formData.managerId}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={errors.managerId ? 'error-input' : ''}
+                aria-describedby="managerId-error"
+              />
+              {touched.managerId && errors.managerId && (
+                <p id="managerId-error" className="error-message" aria-live="polite">
+                  {errors.managerId}
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Form Buttons */}
           <div className="form-buttons">
             <Button label="Cancel" onClick={onClose} className="cancel-btn" />
             <Button
-              label={mode === 'edit' ? 'Update User' : 'Create'}
+              label={mode === 'edit' ? 'Update' : 'Create'}
               type="submit"
               className="create-btn"
+              disabled={isSubmitting}
             />
           </div>
         </form>

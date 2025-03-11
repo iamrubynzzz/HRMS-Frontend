@@ -17,7 +17,6 @@ const Users = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
- 
 
   // Pagination and Filtering State
   const [page, setPage] = useState(0);
@@ -25,8 +24,6 @@ const Users = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [nameFilter, setNameFilter] = useState('');
-
-
 
   // Error Message State
   const [errorMessage, setErrorMessage] = useState('');
@@ -94,11 +91,9 @@ const Users = () => {
       });
 
       setUsers((prevUsers) => [...prevUsers, response.data]);
-      toast.success('User created successfully!');
       setShowForm(false); // Close the form on success
       fetchUsers(); // Refresh the user list
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to add user.");   //Remove this line to not show field specific message in toast notification 
       console.error('Error adding user:', error);
       throw error; // Rethrow the error to be handled in UserForm
     }
@@ -122,12 +117,11 @@ const Users = () => {
       setUsers((prevUsers) =>
         prevUsers.map((user) => (user.id === updatedUser.id ? response.data : user))
       );
-      toast.success('User updated successfully!');
       setShowForm(false); // Close the form on success
       fetchUsers(); // Refresh the user list
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to update user.');
       console.error('Error updating user:', error);
+      throw error; // Rethrow the error to be handled in UserForm
     }
   };
 
@@ -163,7 +157,6 @@ const Users = () => {
     setUserToDelete(null);
   };
 
-  
   return (
     <div className="users-page">
       <h2>All Users</h2>
@@ -186,7 +179,7 @@ const Users = () => {
       {/* Name Filter Input */}
       <div className="filters">
         <label>
-          Search by Name:
+          Search:
           <input
             type="text"
             value={nameFilter}
@@ -215,6 +208,7 @@ const Users = () => {
                 salary: '',
                 annualLeaveBalance: 0,
                 sickLeaveBalance: 0,
+                managerName: '',
               }
             }
             onSubmit={formMode === 'add' ? handleAddUser : handleUpdateUser}
@@ -248,7 +242,7 @@ const Users = () => {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Role</th>
-                  <th>Manager ID</th>
+                  <th>Manager</th>
                   <th>Address</th>
                   <th>RFID</th>
                   <th>Contact</th>
@@ -266,7 +260,7 @@ const Users = () => {
                     <td>{user.name}</td>
                     <td>{user.email}</td>
                     <td>{user.role}</td>
-                    <td>{user.managerId || 'N/A'}</td>
+                    <td>{user.managerName || 'N/A'}</td>
                     <td>{user.address}</td>
                     <td>{user.rfid || 'N/A'}</td>
                     <td>{user.contact}</td>
@@ -288,7 +282,7 @@ const Users = () => {
               <button onClick={handlePreviousPage} disabled={page === 0}>
                 Previous
               </button>
-              <span>Page {page + 1} of {totalPages}</span>
+              <span>Page {page + 1} of {totalPages} (Total Employees: {totalElements})</span>
               <button onClick={handleNextPage} disabled={page === totalPages - 1}>
                 Next
               </button>
@@ -298,7 +292,7 @@ const Users = () => {
           <p>No users found.</p>
         )}
       </div>
-      <ToastContainer />   
+      <ToastContainer />
     </div>
   );
 };
