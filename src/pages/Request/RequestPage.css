@@ -91,13 +91,13 @@ th {
   color: black;
   font-weight: bold;
   padding: 16px;
-  text-align: left;
+  text-align: center;
 }
 
 td {
   border-left: 1px solid #ccc;
   padding: 12px;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid #ddd;
 }
 

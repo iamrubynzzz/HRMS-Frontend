@@ -42,31 +42,42 @@
     color: white;
   }
 
-  /* Sub-items (Approvals: Pending, Approved, Rejected) */
-.sidebar-sub-items {
-  margin-left: 20px; /* Indent sub-items */
-  padding-left: 15px;
-  border-left: 3px solid #236178; /* Line to indicate nesting */
+  
+.sidebar-logout {
+  padding: 20px;
 }
 
-.sidebar-sub-item {
-  padding: 8px 20px;
-  font-size: 14px;
+/* Logout Button */
+.logout-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 20px;
+  background-image: linear-gradient(92.83deg, #2b7a9c 0, #be3e24 100%); 
+  color: white;
+  border: none;
+  margin-top: 130px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.sidebar-sub-item:hover {
-  background-color: #2f7a97;
-  color: white;
+/* Hover Effect */
+.logout-button:hover {
+  background-color: #89312b; 
+  transform: scale(1.02); 
 }
 
-.sidebar-sub-item.active {
-  background-color: #236178;
-  font-weight: bold;
-  color: white;
+.logout-button:active {
+  transform: scale(0.98); 
 }
 
-  
-
-  
+.logout-icon {
+  margin-right: 8px;
+  font-size: 18px;
+}

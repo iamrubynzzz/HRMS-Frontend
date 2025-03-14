@@ -23,7 +23,7 @@ const AdminDashboard = () => {
           {activeSection === 'users' && <UserPage />}
           {activeSection === 'request' && <RequestPage />}
           {activeSection === 'leave' && <LeavePage />}
-          {activeSection === 'salary' && <SalaryPage />}
+          {activeSection === 'payroll' && <SalaryPage />}
         </div>
       </div>
     </div>

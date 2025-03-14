@@ -153,7 +153,7 @@ const RequestPage = () => {
       if (error.response && error.response.status === 400) {
         const backendError = error.response.data.message || 'An error occurred while creating the request.';
   
-        // Set the error state for form fields (if applicable)
+        // Set the error state for form fields 
         if (backendError.includes('Allowance amount')) {
           setErrors((prev) => ({ ...prev, allowanceAmount: backendError }));
         } else if (backendError.includes('Start date')) {
@@ -292,6 +292,13 @@ const RequestPage = () => {
     setShowForm(false);
   };
 
+   // Handle Enter key press
+   const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      fetchRequests();
+    }
+  };
+
   return (
     <div className="request-page">
       <h2>{isAdmin ? 'All Requests' : 'My Requests'}</h2>
@@ -322,12 +329,13 @@ const RequestPage = () => {
               value={employeeNameFilter}
               onChange={(e) => setEmployeeNameFilter(e.target.value)}
               placeholder="Enter employee name..."
+              onKeyPress={handleKeyPress}
             />
           </label>
         )}
         <label>
           Status:
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} onKeyPress={handleKeyPress}>
             <option value="">All</option>
             <option value="APPROVED">Approved</option>
             <option value="PENDING">Pending</option>
@@ -340,6 +348,7 @@ const RequestPage = () => {
             type="date"
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
+            onKeyPress={handleKeyPress}
           />
         </label>
         <button onClick={fetchRequests}>Apply Filters</button>
