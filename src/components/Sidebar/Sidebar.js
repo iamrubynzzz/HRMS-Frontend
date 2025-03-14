@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { FaThLarge, FaUsers, FaCalendarCheck, FaFileInvoiceDollar, FaRegCalendarCheck, FaTasks } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaThLarge, FaUsers, FaCalendarCheck, FaFileInvoiceDollar, FaRegCalendarCheck, FaTasks,FaSignOutAlt  } from 'react-icons/fa';
 import './Sidebar.css';
 
 const Sidebar = ({ setActiveSection }) => {
   const [active, setActive] = useState('dashboard'); 
+  const navigate = useNavigate();
   const [activeSubSection, setActiveSubSection] = useState(null);
   const [showApprovalsSubItems, setShowApprovalsSubItems] = useState(false);
   const [showAttendanceSubItems, setShowAttendanceSubItems] = useState(false);
 
-  // Inside Sidebar component, modify handleSectionClick
 const handleSectionClick = (section) => {
   if (section === 'approvals') {
     setShowApprovalsSubItems(!showApprovalsSubItems);
@@ -32,6 +33,28 @@ const handleSectionClick = (section) => {
   const handleSubSectionClick = (subSection) => {
     setActiveSubSection(subSection);
     setActiveSection(subSection);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('authToken'); // Get token from local storage
+      const response = await fetch('/api/v1/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        localStorage.removeItem('token'); // Remove token from local storage
+        navigate('/login'); // Redirect to login page
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
   return (
@@ -76,6 +99,13 @@ const handleSectionClick = (section) => {
           active={active === 'request'} 
           onClick={() => handleSectionClick('request')} 
         />
+      </div>
+
+      {/* Logout Button */}
+      <div className="sidebar-logout">
+        <button className="logout-button" onClick={handleLogout}>
+          <FaSignOutAlt className="logout-icon" /> Logout
+        </button>
       </div>
     </div>
   );

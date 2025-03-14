@@ -46,10 +46,9 @@ const Attendance = () => {
     }
   };
 
-  // Fetch attendance data on component mount and when filters change
   useEffect(() => {
     fetchAttendance();
-  }, [page, size]); // Add dependencies if you want to refetch when filters change
+  }, [page, size]); 
 
   // Handle Enter key press
   const handleKeyPress = (e) => {
@@ -65,10 +64,10 @@ const Attendance = () => {
         <div className="filter-item">
           <input
             type="text"
-            placeholder="Search by Name"
+            placeholder="Search by Employee Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            onKeyPress={handleKeyPress} // Add Enter key support
+            onKeyPress={handleKeyPress}
           />
           <FaSearch />
         </div>
@@ -80,7 +79,7 @@ const Attendance = () => {
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
             placeholder="Start Date"
-            onKeyPress={handleKeyPress} // Add Enter key support
+            onKeyPress={handleKeyPress}
           />
           <FaCalendarAlt />
         </div>
@@ -92,7 +91,7 @@ const Attendance = () => {
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
             placeholder="End Date"
-            onKeyPress={handleKeyPress} // Add Enter key support
+            onKeyPress={handleKeyPress} 
           />
           <FaCalendarAlt />
         </div>
@@ -102,7 +101,7 @@ const Attendance = () => {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            onKeyPress={handleKeyPress} // Add Enter key support
+            onKeyPress={handleKeyPress} 
           >
             <option value="">Select Status</option>
             <option value="PRESENT">Present</option>
@@ -115,7 +114,7 @@ const Attendance = () => {
           <select
             value={size}
             onChange={(e) => setSize(Number(e.target.value))}
-            onKeyPress={handleKeyPress} // Add Enter key support
+            onKeyPress={handleKeyPress}
           >
             <option value={10}>10 per page</option>
             <option value={20}>20 per page</option>

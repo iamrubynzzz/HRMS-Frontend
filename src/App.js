@@ -20,8 +20,6 @@ const App = () => {
         {/* Route for the welcome page */}
         <Route path="/admin-dashboard" element={<AdminWelcomePage />} />
 
-        
-
       </Routes>
     </Router>
   );
