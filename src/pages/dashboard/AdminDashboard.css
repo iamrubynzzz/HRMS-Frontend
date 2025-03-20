@@ -1,21 +1,91 @@
-/* AdminDashboard.css */
 .admin-dashboard {
-    display: flex;
-    flex-direction: column; 
-    min-height: 100vh; 
-  }
+  display: flex;
+  margin-top: 150px;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-left: 100px;
+}
 
-  
-  .admin-dashboard-content {
-    flex: 1; 
-    display: flex;
-    justify-content: center; 
-    align-items: center; 
-    padding: 20px; 
-  }
-  
-  .content-inner {
-    max-width: 800px; 
-    width: 100%; 
-    text-align: center; 
-  }
+.main-content {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+.stats-cards {
+  display: flex;
+  gap: 30px;
+  width: 90%;
+  max-width: 1200px;
+}
+
+.stat-card {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  flex: 1;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.stat-card p {
+  margin: 10px 0 0;
+  font-size: 28px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.stat-card:nth-child(1) {
+  background-color: #e8f5e9; 
+}
+
+.stat-card:nth-child(2) {
+  background-color: #fff3e0;
+}
+
+.stat-card:nth-child(3) {
+  background-color: #e3f2fd; 
+}
+
+.charts-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.pie-chart-container,
+.bar-chart-container {
+  flex: 1;
+  text-align: center;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pie-chart-container {
+  margin-right: 20px;
+  min-width: 400px;
+}
+
+.pie-chart-container h3,
+.bar-chart-container h3 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}

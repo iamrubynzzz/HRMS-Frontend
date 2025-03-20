@@ -106,6 +106,9 @@ const Attendance = () => {
             <option value="">Select Status</option>
             <option value="PRESENT">Present</option>
             <option value="ABSENT">Absent</option>
+            <option value="ANNUAL_LEAVE">Annual Leave</option> 
+            <option value="SICK_LEAVE">Sick Leave</option>
+            <option value="UNPAID_LEAVE">Unpaid Leave</option>
           </select>
         </div>
 

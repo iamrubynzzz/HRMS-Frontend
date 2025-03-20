@@ -1,13 +1,12 @@
 /*Salary Page Css*/
 .salary-page {
   padding: 20px;
-  margin-top: 150px; 
-  margin-left: 260px;
+  margin-left: 140px;
   background-color: #f4f4f9;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 100vw; 
-  max-width: 1150px; 
+  max-width: 1180px; 
 }
 
 .filters {
