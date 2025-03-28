@@ -44,6 +44,7 @@ const Users = () => {
           name: nameFilter,
         },
         headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true 
       });
 
       console.log('Users Response:', response.data);

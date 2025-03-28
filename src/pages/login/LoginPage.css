@@ -132,7 +132,7 @@ select {
   text-decoration: underline;
 }
 
-.btn-primary {
+.login-btn {
   background-color: #3a85ad;
   color: #fff;
   font-size: 1rem;
@@ -144,21 +144,26 @@ select {
   margin-top: 20px;
 }
 
-.btn-primary:hover {
+.login-btn:hover {
   background-color: #355f74;
 }
 
-.signup-text {
-  font-size: 0.9rem;
-  margin-top: 20px;
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  color: #888;
+  font-size: 14px;
 }
 
-.signup-text a {
-  color: #3a85ad;
-  text-decoration: none;
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+  margin: 0 10px;
 }
 
-.signup-text a:hover {
-  color: #355f74;
-  text-decoration: underline;
-}
+
+
+
