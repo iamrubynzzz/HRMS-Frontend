@@ -39,7 +39,7 @@ const handleSectionClick = (section) => {
     try {
       const token = localStorage.getItem('authToken'); // Get token from local storage
       const response = await fetch('/api/v1/auth/logout', {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,

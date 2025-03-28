@@ -23,7 +23,7 @@ const Attendance = () => {
     setAttendanceData([]); // Clear table before fetching new data
 
     try {
-      const response = await axios.get('http://localhost:8080/api/attendance/all', {
+      const response = await axios.get('/api/attendance/all', {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           name,

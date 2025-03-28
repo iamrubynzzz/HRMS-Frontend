@@ -77,22 +77,11 @@ const AdminDashboard = () => {
     }
   };
 
-  // Polling for real-time updates
+  // Fetch data only once when the component mounts
   useEffect(() => {
-    // Fetch data immediately
     fetchEmployeeStats();
     fetchAttendanceStats();
     fetchSalaryOverview();
-
-    // Set up polling every 5 seconds 
-    const interval = setInterval(() => {
-      fetchEmployeeStats();
-      fetchAttendanceStats();
-      fetchSalaryOverview();
-    }, 5000); // Poll every 5 seconds
-
-    // Cleanup interval on unmount
-    return () => clearInterval(interval);
   }, [token]);
 
   // Format data for the pie chart
@@ -145,9 +134,7 @@ const AdminDashboard = () => {
                       ))}
                     </Pie>
                     <Tooltip />
-                    <Legend layout="vertical" 
-                    align="right" 
-                    verticalAlign="middle" />
+                    <Legend layout="vertical" align="centre" verticalAlign="middle" />
                   </PieChart>
                 </div>
                 <div className="bar-chart-container">

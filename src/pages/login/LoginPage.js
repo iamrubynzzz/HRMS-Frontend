@@ -6,8 +6,9 @@ import { FontAwesomeIcon } from "../../utils/fontawesome";
 import LoginImage from "../../assets/loginImage.png";
 import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import '../../styles/ToastStyles.css'; 
+import { GoogleLogin } from '@react-oauth/google'; 
 
 const LoginPage = () => {
   const [PasswordInputType, ToggleIcon] = UsePasswordToggle();
@@ -17,8 +18,8 @@ const LoginPage = () => {
     role: "",
     companyName: "",
   });
-  const [loading, setLoading] = useState(false); // Loading state
-  const [companies, setCompanies] = useState([]); // State to store companies
+  const [loading, setLoading] = useState(false);
+  const [companies, setCompanies] = useState([]);
   const navigate = useNavigate();
 
   // Fetch companies on component mount
@@ -37,10 +38,10 @@ const LoginPage = () => {
 
   // handleChange function
   const handleChange = (e) => {
-    const { name, value } = e.target; // Extract name and value from the input
+    const { name, value } = e.target;
     setFormData((prev) => ({
-      ...prev, // Keep other formData values
-      [name]: value, // Update the changed field
+      ...prev,
+      [name]: value,
     }));
   };
 
@@ -54,7 +55,6 @@ const LoginPage = () => {
       return;
     }
 
-    // If role is not SUPER_ADMIN, company name is required
     if (formData.role !== "SUPER_ADMIN" && !formData.companyName) {
       toast.error("Company name is required for login.", {
         className: 'custom-toast-error',
@@ -93,6 +93,83 @@ const LoginPage = () => {
     }
   };
 
+  const handleGoogleLogin = async (response) => {
+    try {
+        console.log("Google Response:", response);
+
+        // Clear all tokens before storing the new one
+        localStorage.clear();
+
+        const googleToken = response.credential;
+        if (!googleToken) {
+            toast.error("Google token is missing", {
+                className: 'custom-toast-error'
+            });
+            return;
+        }
+
+        const backendResponse = await axios.post(
+            "http://localhost:8080/oauth2/success",
+            { token: googleToken },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                withCredentials: true
+            }
+        );
+
+        console.log("Backend Response:", backendResponse.data);
+
+        // Store new tokens
+        localStorage.setItem("authToken", backendResponse.data.token);
+        localStorage.setItem("refreshToken", backendResponse.data.refreshToken);
+        localStorage.setItem("userRole", backendResponse.data.role);
+      
+        // Show success toast
+        toast.success("Login successful!", {
+            className: 'custom-toast'
+        });
+      
+        // Redirect after successful login
+        navigate('/admin-dashboard');
+        
+    } catch (error) {
+        console.error("Google login failed:", error);
+        localStorage.clear();
+        
+        // Default error message
+        let errorMessage = "Login failed. Please try again.";
+        
+        if (error.response) {
+            if (error.response.data) {
+                if (error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                } 
+                else if (typeof error.response.data === 'string') {
+                    errorMessage = error.response.data;
+                }
+            }
+            
+            // Specific error messages from backend
+            if (errorMessage.includes("User not registered")) {
+                errorMessage = "User not registered. Please contact your admin to create an account.";
+            } else if (errorMessage.includes("not approved yet")) {
+                errorMessage = "Your account is not approved yet. Please wait for approval.";
+            } else if (errorMessage.includes("Google token verification failed")) {
+                errorMessage = "Google authentication failed. Please try again.";
+            } else if (errorMessage.includes("Google email not verified")) {
+                errorMessage = "Your Google email is not verified. Please use a verified email.";
+            }
+        }
+
+        toast.error(errorMessage, {
+            className: 'custom-toast-error',
+            autoClose: 5000
+        });
+    }
+};
+
   return (
     <div className="login-container">
       <div className="login-card">
@@ -108,9 +185,9 @@ const LoginPage = () => {
               <input
                 type="text"
                 id="email"
-                name="email" 
+                name="email"
                 placeholder="Enter your email"
-                value={formData.email} 
+                value={formData.email}
                 onChange={handleChange}
               />
               <FontAwesomeIcon icon="envelope" className="input-icon" />
@@ -122,9 +199,9 @@ const LoginPage = () => {
               <input
                 type={PasswordInputType}
                 id="password"
-                name="password" 
+                name="password"
                 placeholder="Enter your password"
-                value={formData.password} 
+                value={formData.password}
                 onChange={handleChange}
               />
               <span className="password-toggle">{ToggleIcon}</span>
@@ -135,14 +212,12 @@ const LoginPage = () => {
             <div className="role-select-container">
               <select
                 id="role"
-                name="role" 
+                name="role"
                 className="role-select"
                 value={formData.role}
                 onChange={handleChange}
               >
-                <option value="" disabled>
-                  Select your role
-                </option>
+                <option value="" disabled>Select your role</option>
                 <option value="SUPER_ADMIN">Super Admin</option>
                 <option value="admin">Admin</option>
                 <option value="manager">Manager</option>
@@ -156,14 +231,12 @@ const LoginPage = () => {
               <div className="role-select-container">
                 <select
                   id="companyName"
-                  name="companyName" 
+                  name="companyName"
                   className="role-select"
                   value={formData.companyName}
                   onChange={handleChange}
                 >
-                  <option value="" disabled>
-                    Select your company
-                  </option>
+                  <option value="" disabled>Select your company</option>
                   {companies.map((company) => (
                     <option key={company.id} value={company.name.trim()}>
                       {company.name.trim()}
@@ -174,15 +247,15 @@ const LoginPage = () => {
             </div>
           )}
           <div className="form-footer">
-            <a href="/forgot-password" className="forgot-password">
-              Forgot Password?
-            </a>
+            <Link to="/forgot-password" className="forgot-password">Forgot Password?</Link>
           </div>
-          <Button label={loading ? "Logging in..." : "Login"} onClick={handleLogin} className="btn-primary" disabled={loading} />
+          <Button label={loading ? "Logging in..." : "Login"} onClick={handleLogin} className="login-btn" disabled={loading} />
           <ToastContainer />
-          <p className="signup-text">
-            Don't have an account? <a href="/signup">Sign Up</a>
-          </p>
+          <div className="divider">OR</div>
+          <GoogleLogin
+            onSuccess={handleGoogleLogin}
+            onError={(error) => console.error("Google login error:", error)}
+          />
         </div>
       </div>
     </div>

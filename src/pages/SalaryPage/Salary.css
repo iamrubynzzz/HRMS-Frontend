@@ -1,18 +1,101 @@
-/*Salary Page Css*/
+/* Salary Page CSS */
 .salary-page {
   padding: 20px;
   margin-left: 140px;
   background-color: #f4f4f9;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100vw; 
-  max-width: 1180px; 
+  width: 100vw;
+  max-width: 1180px;
 }
 
 .filters {
   margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-item input {
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.filter-item button {
+  padding: 5px 10px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filter-item button:hover {
+  background-color: #1976d2;
+}
+
+/* Consolidated Salary Table */
+.consolidated-salary-table {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.consolidated-salary-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.consolidated-salary-table th,
+.consolidated-salary-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.consolidated-salary-table th:hover {
+  background-color: #e0e0e0;
+}
+
+.consolidated-salary-table button {
+  margin-right: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.consolidated-salary-table button.view-details {
+  background-color: #2196f3;
+  color: white;
+}
+
+.consolidated-salary-table button.view-details:hover {
+  background-color: #1976d2;
+}
+
+.consolidated-salary-table button.release {
+  background-color: #ff9800;
+  color: white;
+}
+
+.consolidated-salary-table button.release:hover {
+  background-color: #f57c00;
+}
+
+/* Individual Salary Table */
 .salary-table {
   width: 100%;
   overflow-x: auto;
@@ -32,19 +115,50 @@
 
 .salary-table th {
   background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+.salary-table th:hover {
+  background-color: #e0e0e0;
 }
 
 .salary-table button {
   margin-right: 5px;
   padding: 5px 10px;
   cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
 }
 
-.salary-table th:nth-child(9),
-.salary-table td:nth-child(9) {
-  width: 200px; 
+.salary-table button.generate {
+  background-color: #4caf50;
+  color: white;
 }
 
+.salary-table button.generate:hover {
+  background-color: #45a049;
+}
+
+.salary-table button.approve {
+  background-color: #2196f3;
+  color: white;
+}
+
+.salary-table button.approve:hover {
+  background-color: #1976d2;
+}
+
+.salary-table button.release {
+  background-color: #ff9800;
+  color: white;
+}
+
+.salary-table button.release:hover {
+  background-color: #f57c00;
+}
+
+/* Pagination */
 .pagination {
   display: flex;
   align-items: center;
@@ -54,41 +168,48 @@
 
 .pagination button {
   padding: 5px 10px;
-  cursor: pointer;
-}
-
-.pagination select {
-  padding: 5px;
-}
-
-.salary-table th {
-  cursor: pointer;
-}
-
-.salary-table th:hover {
-  background-color: #f4f4f4;
-}
-
-button {
-  padding: 5px 10px;
-  margin: 2px;
+  background-color: #2196f3;
+  color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #bdbdbd;
+  cursor: not-allowed;
+}
+
+.pagination span {
   font-size: 14px;
 }
 
-button.generate {
-  background-color: #4CAF50; 
-  color: white;
+/* Toast Notifications */
+.ToastContainer {
+  font-size: 14px;
 }
 
-button.approve {
-  background-color: #2196F3; 
-  color: white;
+/* Back Button */
+.back-button {
+  display: flex;
+  margin-bottom: 20px;
+  align-items: center; 
+  gap: 8px; 
+  padding: 8px 16px; 
+  background-color: #2196f3;
+  color: white; 
+  border: none;
+  border-radius: 5px; 
+  cursor: pointer; 
+  font-size: 14px; 
+  transition: background-color 0.3s ease; 
 }
 
-button.release {
-  background-color: #FF9800; 
-  color: white;
+.back-button:hover {
+  background-color: #1976d2; 
 }
+
+.back-button svg {
+  font-size: 16px; 
+}
+
