@@ -1,119 +1,291 @@
-/* Header.css */
-
 .header-container {
-    background-color: #4a90b1; 
-    padding: 10px 20px; 
-    height: 80px;
-    min-width: 100vw;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    left: 0;
-    top: 0;
-  }
-  
-  .header {
-    display: flex; 
-    align-items: center; 
-    flex-shrink: 0;
-    justify-content: space-between; 
-  }
-  
-  .header-logo-container {
-    display: flex; 
-    align-items: center; 
-    margin-left: 80px;
-  }
-  
-  .header-logo {
-    width: 40px; 
-    height: auto; 
-    margin-right: 10px; 
-  }
-  
-  .header-company-name {
-    font-size: 1.5rem; 
-    color: #333;;
-  }
-  
-  .header-search-container {
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    margin-right:0px; 
-  }
-  
-  .header-search-box {
-    position: relative;
-    display: flex; 
-    align-items: center;
-  }
-  
-  .header-search-input {
-    width: 100%;
-    padding: 10px 35px 10px 10px;
-    border: 1px solid #ccc; 
-    border-radius: 20px; 
-    outline: none; 
-  }
-  
-  .header-search-btn {
-    position: absolute;
-    right: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    color: #888;
-  }
+  background-color: #4a90b1;
+  padding: 10px 20px;
+  height: 80px;
+  width: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+}
 
-  .header-notification-icon {
-    font-size: 1.5rem; 
-    margin-right: 50px; 
-    cursor: pointer; 
-  }
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 100%;
+}
 
-  
-  .header-notification-icon {
-    position: relative;
-    cursor: pointer;
-    font-size: 1.5rem;
-  }
-  
-  .notification-count {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background-color: red;
-    color: white;
-    border-radius: 50%;
-    padding: 2px 6px;
-    font-size: 0.8rem;
-  }
-  
-  .notification-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: white;
-    border: 1px solid #ccc;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 250px;
-    max-height: 300px;
-    overflow-y: auto;
-    z-index: 1000;
-    display: none;
-  }
-  
-  .header-notification-icon:hover .notification-dropdown {
-    display: block;
-  }
-  
-  .notification-item {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    font-size: 0.9rem;
-  }
-  
-  .notification-item:last-child {
-    border-bottom: none;
-  }
+.header-logo-container {
+  display: flex;
+  align-items: center;
+  min-width: 250px;
+}
+
+.header-logo {
+  width: 40px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.header-company-name {
+  font-size: 1.5rem;
+  color: rgb(20, 19, 19);
+  white-space: nowrap;
+}
+
+.header-search-container {
+  flex: 1;
+  max-width: 500px;
+  margin: 0 20px;
+}
+
+.header-search-box {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.header-search-input {
+  width: 100%;
+  padding: 10px 35px 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  outline: none;
+}
+
+.header-search-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #888;
+}
+
+.header-right-section {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  min-width: 150px;
+  justify-content: flex-end;
+}
+
+/* Notification styles */
+.notification-container {
+  position: relative;
+  margin-right: 20px;
+}
+
+.header-notification-icon {
+  position: relative;
+  cursor: pointer;
+  font-size: 1.7rem;
+  color: #F7BB07;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.header-notification-icon:hover {
+  background-color: rgba(247, 187, 7, 0.2);
+}
+
+.notification-count {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.notification-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  width: 350px;
+  max-height: 400px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 1;
+}
+
+.notification-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.mark-all-read {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.mark-all-read:hover {
+  background-color: #f0f8ff;
+}
+
+.mark-all-read:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+  background: none;
+}
+
+.notification-empty {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+}
+
+.notification-list-container {
+  overflow-y: auto;
+  flex: 1;
+  max-height: 350px;
+}
+
+.notification-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.notification-item {
+  display: flex;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-height: 60px;
+}
+
+.notification-item.unread {
+  background-color: #f8f9fa;
+}
+
+.notification-item:hover {
+  background-color: #f0f7ff;
+}
+
+.notification-icon-container {
+  margin-right: 12px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+
+.notification-icon.approval {
+  color: #2ecc71;
+}
+
+.notification-icon.task {
+  color: #e67e22;
+}
+
+.notification-icon.default {
+  color: #3498db;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-message {
+  margin: 0 0 4px 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.notification-time {
+  color: #777;
+  font-size: 0.8rem;
+}
+
+.mark-as-read {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: 8px;
+  align-self: center;
+}
+
+.mark-as-read:hover {
+  color: #777;
+}
+
+/* Custom scrollbar */
+.notification-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notification-list-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.notification-list-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.notification-list-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.user-initials-circle {
+  width: 45px;
+  height: 40px;
+  background-color: white;
+  color: #16191a;
+  font-weight: bolder;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  margin-right: 20px;
+}
+
+.user-initials-circle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
