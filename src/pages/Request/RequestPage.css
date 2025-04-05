@@ -257,7 +257,12 @@ tr:hover {
   width: 150px; 
 }
 
+
 .request-table th:nth-child(10),
 .request-table td:nth-child(10) {
-  width: 200px; 
+  min-width: 100px; 
+  width: auto; 
+  white-space: nowrap; 
+  padding: 12px 20px; 
 }
+

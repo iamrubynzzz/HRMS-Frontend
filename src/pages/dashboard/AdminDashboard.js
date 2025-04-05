@@ -7,6 +7,7 @@ import UserPage from '../../pages/UserManagement/Users';
 import RequestPage from '../Request/RequestPage';
 import LeavePage from '../LeavePage/Leave';
 import SalaryPage from '../SalaryPage/Salary';
+import Settings from '../Settings/Settings';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -163,6 +164,7 @@ const AdminDashboard = () => {
           {activeSection === 'request' && <RequestPage />}
           {activeSection === 'leave' && <LeavePage />}
           {activeSection === 'payroll' && <SalaryPage />}
+          {activeSection === 'settings' && <Settings />}
         </div>
       </div>
     </div>

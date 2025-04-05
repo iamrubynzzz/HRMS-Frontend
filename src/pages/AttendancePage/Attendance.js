@@ -17,30 +17,58 @@ const Attendance = () => {
 
   const token = localStorage.getItem('authToken');
   const userRole = localStorage.getItem('userRole');
+
+  const getApiEndpoint = () => {
+    const role = userRole?.toUpperCase();
+    switch (role) {
+      case 'ADMIN':
+        return '/api/attendance/all';
+      case 'MANAGER':
+        return '/api/attendance/manager-attendance';
+      case 'EMPLOYEE':
+        return '/api/attendance/my-attendance';
+      default:
+        return '/api/attendance/my-attendance';
+    }
+  };
+  
   const fetchAttendance = async () => {
     setLoading(true);
     setError('');
-    setAttendanceData([]); // Clear table before fetching new data
+    setAttendanceData([]);
 
     try {
-      const response = await axios.get('/api/attendance/all', {
+      const endpoint = getApiEndpoint();
+      const params = {
+        page,
+        size,
+      };
+
+      const role = userRole?.toUpperCase();
+      if (role === 'ADMIN' || role === 'MANAGER') {
+        if (name) params.name = name;
+      }
+      
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+      if (status) params.status = status;
+
+      console.log('Request Params:', params); 
+
+      const response = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
-        params: {
-          name,
-          startDate,
-          endDate,
-          status,
-          page,
-          size,
-        },
+        params,
       });
 
-      console.log('Response:', response.data);
-      setAttendanceData(response.data.content);
-      setTotalPages(response.data.totalPages);
+      console.log('API Response:', response.data);
+      
+      // All endpoints now return data in the same format
+      setAttendanceData(response.data.content || []);
+      setTotalPages(response.data.totalPages || 0);
+      
     } catch (error) {
-      console.error('Error fetching attendance data:', error.response ? error.response.data : error.message);
-      setError(error.response ? error.response.data : 'Failed to fetch attendance data.');
+      console.error('Error fetching attendance data:', error);
+      setError(error.response?.data?.message || 'Failed to fetch attendance data.');
     } finally {
       setLoading(false);
     }
@@ -48,31 +76,31 @@ const Attendance = () => {
 
   useEffect(() => {
     fetchAttendance();
-  }, [page, size]); 
+  }, [page, size, userRole]); 
 
-  // Handle Enter key press
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       fetchAttendance();
     }
   };
 
+  const role = userRole?.toUpperCase();
   return (
     <div className="attendance-page">
       <div className="filters">
-        {/* Filter by name */}
-        <div className="filter-item">
-          <input
-            type="text"
-            placeholder="Search by Employee Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyPress={handleKeyPress}
-          />
-          <FaSearch />
-        </div>
+        {(role === 'ADMIN' || role === 'MANAGER') && (
+          <div className="filter-item">
+            <input
+              type="text"
+              placeholder="Search by Employee Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyPress={handleKeyPress}
+            />
+            <FaSearch />
+          </div>
+        )}
 
-        {/* Filter by start date */}
         <div className="filter-item">
           <input
             type="date"
@@ -84,7 +112,6 @@ const Attendance = () => {
           <FaCalendarAlt />
         </div>
 
-        {/* Filter by end date */}
         <div className="filter-item">
           <input
             type="date"
@@ -96,7 +123,6 @@ const Attendance = () => {
           <FaCalendarAlt />
         </div>
 
-        {/* Filter by status */}
         <div className="filter-item">
           <select
             value={status}
@@ -112,7 +138,6 @@ const Attendance = () => {
           </select>
         </div>
 
-        {/* Pagination size */}
         <div className="filter-item">
           <select
             value={size}
@@ -125,14 +150,11 @@ const Attendance = () => {
           </select>
         </div>
 
-        {/* Search button */}
         <button onClick={fetchAttendance}>Apply Filters</button>
       </div>
 
-      {/* Error handling */}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* Attendance table */}
       <div className="attendance-table">
         {loading ? (
           <p>Loading attendance data...</p>
@@ -148,36 +170,45 @@ const Attendance = () => {
               </tr>
             </thead>
             <tbody>
-              {attendanceData.map((entry, index) => (
-                <tr key={index}>
-                  <td>{entry.name}</td>
-                  <td>{entry.date}</td>
-                  <td>{entry.punchIn || 'N/A'}</td>
-                  <td>{entry.punchOut || 'N/A'}</td>
-                  <td>{entry.status}</td>
+              {attendanceData.length > 0 ? (
+                attendanceData.map((entry, index) => (
+                  <tr key={index}>
+                    <td>{entry.name || 'N/A'}</td>
+                    <td>{entry.date || 'N/A'}</td>
+                    <td>{entry.punchIn || 'N/A'}</td>
+                    <td>{entry.punchOut || 'N/A'}</td>
+                    <td>{entry.status || 'N/A'}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: 'center' }}>
+                    No attendance records found
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         )}
       </div>
 
-      {/* Pagination controls */}
-      <div className="pagination">
-        <button
-          onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-          disabled={page === 0}
-        >
-          Previous
-        </button>
-        <span>Page {page + 1} of {totalPages}</span>
-        <button
-          onClick={() => setPage((prev) => prev + 1)}
-          disabled={page + 1 >= totalPages}
-        >
-          Next
-        </button>
-      </div>
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+            disabled={page === 0}
+          >
+            Previous
+          </button>
+          <span>Page {page + 1} of {totalPages}</span>
+          <button
+            onClick={() => setPage((prev) => prev + 1)}
+            disabled={page + 1 >= totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -204,7 +204,7 @@ const LoginPage = () => {
                 value={formData.password}
                 onChange={handleChange}
               />
-              <span className="password-toggle">{ToggleIcon}</span>
+              <span className="eye-toggle">{ToggleIcon}</span>
             </div>
           </div>
           <div className="form-group">
