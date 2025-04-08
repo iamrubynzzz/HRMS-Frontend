@@ -6,7 +6,7 @@ import AttendancePage from '../../pages/AttendancePage/Attendance';
 import UserPage from '../../pages/UserManagement/Users';
 import RequestPage from '../Request/RequestPage';
 import LeavePage from '../LeavePage/Leave';
-import SalaryPage from '../SalaryPage/Salary';
+import SalaryPage from '../SalaryPage/FullSalaryPage';
 import Settings from '../Settings/Settings';
 import './AdminDashboard.css';
 

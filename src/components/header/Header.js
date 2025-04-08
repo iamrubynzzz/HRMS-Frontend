@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "./Header.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faSearch, faTimes, faCheck, faExclamation } from "@fortawesome/free-solid-svg-icons";
-import Logo from "../../assets/logo.png";
+import Logo from "../../assets/logo2.png";
 const Header = () => {
   const [notifications, setNotifications] = useState([]);
   const [userInitials, setUserInitials] = useState("");
@@ -131,14 +131,14 @@ const Header = () => {
           <h1 className="header-company-name">Flourish HR Automation</h1>
         </div>
 
-        <div className="header-search-container">
+        {/* <div className="header-search-container">
           <div className="header-search-box">
             <input type="text" placeholder="Search..." className="header-search-input" />
             <button className="header-search-btn">
               <FontAwesomeIcon icon={faSearch} />
             </button>
           </div>
-        </div>
+        </div> */}
 
         <div className="header-right-section">
           <div className="notification-container">

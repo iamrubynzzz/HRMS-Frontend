@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Button from '../../components/common/Button';
 import UserForm from '../../components/UserForm/UserForm';
 import ConfirmationMessage from '../../components/ConfirmationModal/Confirmation';
+import {  FaSearch } from 'react-icons/fa';
 import './Users.css';
 
 const Users = () => {
@@ -179,16 +180,19 @@ const Users = () => {
 
       {/* Name Filter Input */}
       <div className="filters">
-        <label>
-          Search:
-          <input
-            type="text"
-            value={nameFilter}
-            onChange={handleNameFilterChange}
-            placeholder="Enter name..."
-          />
-        </label>
-      </div>
+  <div className="filter-item">
+    <input
+      type="text"
+      placeholder="Search by Name"
+      value={nameFilter}
+      onChange={handleNameFilterChange}
+      onKeyPress={(e) => e.key === 'Enter' && fetchUsers()}
+    />
+    <FaSearch />
+  </div>
+  
+  <button onClick={fetchUsers}>Apply Filters</button>
+</div>
 
       {/* User Form */}
       {showForm && (

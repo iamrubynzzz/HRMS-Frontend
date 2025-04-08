@@ -5,7 +5,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './Salary.css';
 
-
 const Salary = () => {
   const [salaries, setSalaries] = useState([]);
   const [consolidatedSalaries, setConsolidatedSalaries] = useState([]);
@@ -405,12 +404,13 @@ const Salary = () => {
                     <td>{salary.calculationDate}</td>
                     <td>{salary.status}</td>
                     <td>
-                      <button
+                      {salary.status === 'RELEASED' && (
+                      <button 
                         className="generate"
-                        onClick={() => handleGenerateReport(salary.id)}
-                      >
-                        Export
+                        onClick={() => handleGenerateReport(salary.id)}>
+                        Generate Report
                       </button>
+                    )}
                     </td>
                   </tr>
                 ))}

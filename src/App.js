@@ -1,12 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/login/LoginPage';  
-import SignupPage from './pages/signUp/SignupPage';
 import AdminWelcomePage from "./pages/dashboard/AdminDashboard";
 import 'react-toastify/dist/ReactToastify.css';
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ForgotPassword/ResetPassword ";
-import { GoogleOAuthProvider } from '@react-oauth/google'; // Import the provider
+import Settings from "./pages/Settings/Settings";
+import { GoogleOAuthProvider } from '@react-oauth/google'; 
+import ProtectedRoute from './routes/ProtectedRoute'; 
 
 const App = () => {
   return (
@@ -19,15 +20,26 @@ const App = () => {
           {/* Route for the login page */}
           <Route path="/login" element={<LoginPage />} />
 
-          {/* Route for the signup page */}
-          <Route path="/signup" element={<SignupPage />} />
-
-          {/* Route for the welcome page */}
-          <Route path="/admin-dashboard" element={<AdminWelcomePage />} />
-
+           {/* Protected route for the admin dashboard, accessible by Admin, Manager, Employee, and Super Admin */}
+           <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'EMPLOYEE']}>
+                <AdminWelcomePage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'EMPLOYEE']}>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </GoogleOAuthProvider>

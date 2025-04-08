@@ -140,13 +140,13 @@
   background-color: #45a049;
 }
 
-.salary-table button.approve {
-  background-color: #2196f3;
+ button.approve {
+  background-color: #4CAF50;
   color: white;
 }
 
-.salary-table button.approve:hover {
-  background-color: #1976d2;
+button.approve:hover {
+  background-color: #45a049;
 }
 
 .salary-table button.release {
@@ -157,6 +157,7 @@
 .salary-table button.release:hover {
   background-color: #f57c00;
 }
+
 
 /* Pagination */
 .pagination {
@@ -211,5 +212,28 @@
 
 .back-button svg {
   font-size: 16px; 
+}
+
+.generate {
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.generate:hover {
+  background-color: #219653;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+  .salary-table table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }
 

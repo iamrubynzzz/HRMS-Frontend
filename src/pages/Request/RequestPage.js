@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import RequestForm from './RequestForm';
+import { FaCalendarAlt, FaSearch } from 'react-icons/fa';
 import Confirmation from '../../components/ConfirmationModal/Confirmation';
 import SuccessModal from '../../components/SuccessModal/SuccessMessage';
 import './RequestPage.css';
@@ -320,39 +321,46 @@ const RequestPage = () => {
         />
       )}
 
-      <div className="filters">
-        {isAdmin && (
-          <label>
-            Name:
-            <input
-              type="text"
-              value={employeeNameFilter}
-              onChange={(e) => setEmployeeNameFilter(e.target.value)}
-              placeholder="Enter employee name..."
-              onKeyPress={handleKeyPress}
-            />
-          </label>
-        )}
-        <label>
-          Status:
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} onKeyPress={handleKeyPress}>
-            <option value="">All</option>
-            <option value="APPROVED">Approved</option>
-            <option value="PENDING">Pending</option>
-            <option value="REJECTED">Rejected</option>
-          </select>
-        </label>
-        <label>
-          Date:
-          <input
-            type="date"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            onKeyPress={handleKeyPress}
-          />
-        </label>
-        <button onClick={fetchRequests}>Apply Filters</button>
-      </div>
+<div className="filters">
+  {isAdmin && (
+    <div className="filter-item">
+      <input
+        type="text"
+        placeholder="Search by Name"
+        value={employeeNameFilter}
+        onChange={(e) => setEmployeeNameFilter(e.target.value)}
+        onKeyPress={handleKeyPress}
+      />
+      <FaSearch />
+    </div>
+  )}
+
+  <div className="filter-item">
+    <select
+      value={statusFilter}
+      onChange={(e) => setStatusFilter(e.target.value)}
+      onKeyPress={handleKeyPress}
+    >
+      <option value="">All Status</option>
+      <option value="APPROVED">Approved</option>
+      <option value="PENDING">Pending</option>
+      <option value="REJECTED">Rejected</option>
+    </select>
+  </div>
+
+  <div className="filter-item">
+    <input
+      type="date"
+      value={dateFilter}
+      onChange={(e) => setDateFilter(e.target.value)}
+      placeholder="Filter by Date"
+      onKeyPress={handleKeyPress}
+    />
+    <FaCalendarAlt />
+  </div>
+
+  <button onClick={fetchRequests}>Apply Filters</button>
+</div>
 
       <table className="request-table">
         <thead>
