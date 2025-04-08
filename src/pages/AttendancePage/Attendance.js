@@ -6,6 +6,7 @@ import './Attendance.css';
 const Attendance = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [name, setName] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -87,12 +88,13 @@ const Attendance = () => {
   const role = userRole?.toUpperCase();
   return (
     <div className="attendance-page">
+      <h2>Attendance Records</h2>
       <div className="filters">
         {(role === 'ADMIN' || role === 'MANAGER') && (
           <div className="filter-item">
             <input
               type="text"
-              placeholder="Search by Employee Name"
+              placeholder="Search by Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -138,7 +140,7 @@ const Attendance = () => {
           </select>
         </div>
 
-        <div className="filter-item">
+        {/* <div className="filter-item">
           <select
             value={size}
             onChange={(e) => setSize(Number(e.target.value))}
@@ -148,7 +150,7 @@ const Attendance = () => {
             <option value={20}>20 per page</option>
             <option value={50}>50 per page</option>
           </select>
-        </div>
+        </div> */}
 
         <button onClick={fetchAttendance}>Apply Filters</button>
       </div>

@@ -21,19 +21,29 @@
 .header-logo-container {
   display: flex;
   align-items: center;
-  min-width: 250px;
+  margin-right: auto; 
+  padding-left: 10px; 
+  margin-left: -60px;
 }
 
 .header-logo {
-  width: 40px;
-  height: auto;
-  margin-right: 10px;
+  width: 100px; 
+  height: 100px;
+  object-fit: contain; 
+  transition: transform 0.3s ease; 
+}
+
+.header-logo:hover {
+  transform: scale(1.05);
 }
 
 .header-company-name {
   font-size: 1.5rem;
   color: rgb(20, 19, 19);
   white-space: nowrap;
+  margin-left: 15px; 
+  font-weight: 600; 
+  letter-spacing: 0.5px; 
 }
 
 .header-search-container {
@@ -289,3 +299,4 @@
   transform: scale(1.05);
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+
