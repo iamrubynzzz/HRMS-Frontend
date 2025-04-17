@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Button from '../../components/common/Button';
 import UserForm from '../../components/UserForm/UserForm';
 import ConfirmationMessage from '../../components/ConfirmationModal/Confirmation';
-import {  FaSearch } from 'react-icons/fa';
 import './Users.css';
 
 const Users = () => {
@@ -30,24 +29,55 @@ const Users = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const token = localStorage.getItem('authToken');
-
-  // Fetch users with pagination and filtering
+  const userRole = localStorage.getItem('userRole')?.toLowerCase();
+  const isAdmin = userRole === 'admin';
+  const isSuperAdmin = userRole === 'super_admin';
+  const isManager = userRole === 'manager';
+ 
+  // Fetch users based on role
   const fetchUsers = async () => {
     setLoading(true);
     setError('');
     setUsers([]);
-
+  
     try {
-      const response = await axios.get('/api/v1/user/all', {
-        params: {
-          page,
-          size,
-          name: nameFilter,
-        },
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true 
-      });
-
+      let response;
+      
+      if (isSuperAdmin) {
+        // Super Admin fetches all admins
+        response = await axios.get('/api/v1/user/admins', {
+          params: {
+            page,
+            size,
+            name: nameFilter,
+          },
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true 
+        });
+      } else if (isAdmin) {
+        // Admin fetches all users
+        response = await axios.get('/api/v1/user/all', {
+          params: {
+            page,
+            size,
+            name: nameFilter,
+          },
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true 
+        });
+      } else if (isManager) {
+        // Manager fetches assigned employees
+        response = await axios.get('/api/v1/user/assigned-employees', {
+          params: {
+            page,
+            size,
+            name: nameFilter,
+          },
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true 
+        });
+      }
+  
       console.log('Users Response:', response.data);
       setUsers(response.data.content);
       setTotalPages(response.data.totalPages);
@@ -85,7 +115,7 @@ const Users = () => {
     setPage(0);
   };
 
-  // Handle add user
+  // Handle add user (admin/super_admin only)
   const handleAddUser = async (newUser) => {
     try {
       const response = await axios.post('/api/v1/user/create', newUser, {
@@ -93,15 +123,15 @@ const Users = () => {
       });
 
       setUsers((prevUsers) => [...prevUsers, response.data]);
-      setShowForm(false); // Close the form on success
-      fetchUsers(); // Refresh the user list
+      setShowForm(false);
+      fetchUsers();
     } catch (error) {
       console.error('Error adding user:', error);
-      throw error; // Rethrow the error to be handled in UserForm
+      throw error;
     }
   };
 
-  // Handle edit user
+  // Handle edit user (admin/super_admin only)
   const handleEditUser = (id) => {
     const userToEdit = users.find((user) => user.id === id);
     setCurrentUser(userToEdit);
@@ -109,7 +139,7 @@ const Users = () => {
     setShowForm(true);
   };
 
-  // Handle update user
+  // Handle update user (admin/super_admin only)
   const handleUpdateUser = async (updatedUser) => {
     try {
       const response = await axios.put(`/api/v1/user/${updatedUser.id}`, updatedUser, {
@@ -119,34 +149,34 @@ const Users = () => {
       setUsers((prevUsers) =>
         prevUsers.map((user) => (user.id === updatedUser.id ? response.data : user))
       );
-      setShowForm(false); // Close the form on success
-      fetchUsers(); // Refresh the user list
+      setShowForm(false);
+      fetchUsers();
     } catch (error) {
       console.error('Error updating user:', error);
-      throw error; // Rethrow the error to be handled in UserForm
+      throw error;
     }
   };
 
-  // Handle delete user
+  // Handle delete user (admin/super_admin only)
   const handleDeleteUser = async (id) => {
     setUserToDelete(id);
     setShowDeleteModal(true);
   };
 
-  // Confirm delete
+  // Confirm delete (admin/super_admin only)
   const confirmDelete = async () => {
     if (!userToDelete) return;
-
+  
     try {
       await axios.delete(`/api/v1/user/${userToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userToDelete));
-      toast.success('User deleted successfully!');
+  
+      toast.success('User deactivated successfully!');
+      fetchUsers(); // Refresh list
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to delete user.');
-      console.error('Error deleting user:', error);
+      toast.error(error.response?.data?.message || 'Failed to deactivate user.');
+      console.error('Error deactivating user:', error);
     } finally {
       setShowDeleteModal(false);
       setUserToDelete(null);
@@ -159,43 +189,47 @@ const Users = () => {
     setUserToDelete(null);
   };
 
+  const canAddUser = ['admin', 'super_admin'].includes(userRole?.toLowerCase());
+  const canEditDelete = ['admin', 'super_admin'].includes(userRole?.toLowerCase());
+
   return (
     <div className="users-page">
-      <h2>All Users</h2>
+      <h2>{isAdmin || isSuperAdmin ? 'All Users' : 'My Team'}</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* Add User Button */}
-      <div className="users-header">
-        <Button
-          label="Add User"
-          onClick={() => {
-            setShowForm(true);
-            setFormMode('add');
-            setCurrentUser(null);
-          }}
-          className="add-user-btn"
-          disabled={loading}
-        />
-      </div>
+      {/* Add User Button (admin/super_admin only) */}
+      {canAddUser && (
+        <div className="users-header">
+          <Button
+            label="Add User"
+            onClick={() => {
+              setShowForm(true);
+              setFormMode('add');
+              setCurrentUser(null);
+            }}
+            className="add-user-btn"
+            disabled={loading}
+          />
+        </div>
+      )}
 
       {/* Name Filter Input */}
       <div className="filters">
-  <div className="filter-item">
-    <input
-      type="text"
-      placeholder="Search by Name"
-      value={nameFilter}
-      onChange={handleNameFilterChange}
-      onKeyPress={(e) => e.key === 'Enter' && fetchUsers()}
-    />
-    <FaSearch />
-  </div>
-  
-  <button onClick={fetchUsers}>Apply Filters</button>
-</div>
+        <div className="filter-item">
+          <input
+            type="text"
+            placeholder="Search by Name"
+            value={nameFilter}
+            onChange={handleNameFilterChange}
+            onKeyPress={(e) => e.key === 'Enter' && fetchUsers()}
+          />
+          <FaSearch />
+        </div>
+        <button onClick={fetchUsers}>Apply Filters</button>
+      </div>
 
-      {/* User Form */}
-      {showForm && (
+      {/* User Form (admin/super_admin only) */}
+      {showForm && (isAdmin || isSuperAdmin) && (
         <div className="user-form-overlay">
           <UserForm
             initialValues={
@@ -213,7 +247,7 @@ const Users = () => {
                 salary: '',
                 annualLeaveBalance: 0,
                 sickLeaveBalance: 0,
-                managerName: '',
+                managerId: '',
               }
             }
             onSubmit={formMode === 'add' ? handleAddUser : handleUpdateUser}
@@ -225,10 +259,10 @@ const Users = () => {
         </div>
       )}
 
-      {/* Confirmation Modal */}
-      {showDeleteModal && (
+      {/* Confirmation Modal (admin/super_admin only) */}
+      {showDeleteModal && (isAdmin || isSuperAdmin) && (
         <ConfirmationMessage
-          message={`Are you sure you want to delete user ID: ${userToDelete}?`}
+          message={`Are you sure you want to deactivate user ID: ${userToDelete}?`}
           onConfirm={confirmDelete}
           onCancel={cancelDelete}
         />
@@ -255,7 +289,7 @@ const Users = () => {
                   <th>Gender</th>
                   <th>Hire Date</th>
                   <th>Salary</th>
-                  <th>Actions</th>
+                  {(isAdmin || isSuperAdmin) && <th>Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -273,10 +307,12 @@ const Users = () => {
                     <td>{user.gender}</td>
                     <td>{user.hireDate}</td>
                     <td>{user.salary}</td>
-                    <td className="actions-cell">
-                      <FaEdit onClick={() => handleEditUser(user.id)} className="action-icon edit-icon" />
-                      <FaTrash onClick={() => handleDeleteUser(user.id)} className="action-icon delete-icon" />
-                    </td>
+                    {(isAdmin || isSuperAdmin) && (
+                      <td className="actions-cell">
+                        <FaEdit onClick={() => handleEditUser(user.id)} className="action-icon edit-icon" />
+                        <FaTrash onClick={() => handleDeleteUser(user.id)} className="action-icon delete-icon" />
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -287,7 +323,7 @@ const Users = () => {
               <button onClick={handlePreviousPage} disabled={page === 0}>
                 Previous
               </button>
-              <span>Page {page + 1} of {totalPages} (Total Employees: {totalElements})</span>
+              <span>Page {page + 1} of {totalPages} (Total {isAdmin || isSuperAdmin ? 'Users' : 'Employees'}: {totalElements})</span>
               <button onClick={handleNextPage} disabled={page === totalPages - 1}>
                 Next
               </button>

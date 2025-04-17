@@ -12,7 +12,7 @@
 /* Filters section */
 .filters {
   display: flex;
-  gap: 15px;
+  gap: 20px;
   margin-bottom: 20px;
 }
 
@@ -114,4 +114,38 @@ body {
 .pagination span {
   font-size: 14px;
   font-weight: bold;
+}
+
+/* Add to Attendance.css */
+.filter-actions {
+  display: flex;
+  justify-content: end;
+  gap: 10px;
+}
+
+.generate-attendance-btn {
+  
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  background-color: #28a745;
+}
+
+.generate-attendance-btn:hover{
+  background-color: #218838;
+}
+
+.generate-report-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.success-message {
+  color: green;
+  margin: 10px 0;
+}
+
+.error-message {
+  color: red;
+  margin: 10px 0;
 }

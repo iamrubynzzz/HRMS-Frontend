@@ -72,33 +72,6 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
     let error = '';
 
     switch (fieldName) {
-      case 'name':
-        if (!value.trim()) error = 'Name is required.';
-        break;
-      case 'email':
-        if (!value.trim()) error = 'Email is required.';
-        break;
-      case 'rfid':
-        if (!value.trim()) error = 'RFID is required.';
-        break;
-      case 'role':
-        if (!value) error = 'Role is required.';
-        break;
-      case 'address':
-        if (!value.trim()) error = 'Address is required.';
-        break;
-      case 'contact':
-        if (!value.trim()) error = 'Contact is required.';
-        break;
-      case 'dateOfBirth':
-        if (!value) error = 'Date of Birth is required.';
-        break;
-      case 'gender':
-        if (!value) error = 'Gender is required.';
-        break;
-      case 'hireDate':
-        if (!value) error = 'Hire Date is required.';
-        break;
       case 'salary':
         if (!value || value <= 0) error = 'Salary must be a positive number.';
         break;
@@ -107,14 +80,6 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
         break;
       case 'sickLeaveBalance':
         if (formData.role !== 'ADMIN' && value < 0) error = 'Sick Leave Balance cannot be negative.';
-        break;
-      case 'managerId':
-        if (formData.role !== 'ADMIN' && !value) error = 'Manager ID is required.';
-        break;
-      case 'companyName':
-        if (formData.role === 'ADMIN' && !value) error = 'Company Name is required for Admins.';
-        break;
-      default:
         break;
     }
 
@@ -160,7 +125,12 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
             ...prev,
             annualLeaveBalance: data.message.includes("Annual Leave Balance") ? data.message : '',
             sickLeaveBalance: data.message.includes("Sick Leave Balance") ? data.message : '',
-            managerId: data.message.includes("Manager ID") ? data.message : '',
+            managerId:
+            (formData.role === 'EMPLOYEE' && data.message.includes("Manager ID")) ||
+            (formData.role === 'MANAGER' && data.message.includes("Admin ID"))
+              ? data.message
+              : '',
+           
           }));
         } else if (status === 403) {
           setErrors((prev) => ({
@@ -204,6 +174,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
               value={formData.name}
               onChange={handleChange}
               onBlur={handleBlur}
+              required
               className={errors.name ? 'error-input' : ''}
               aria-describedby="name-error"
             />
@@ -224,6 +195,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
               value={formData.email}
               onChange={handleChange}
               onBlur={handleBlur}
+              required
               className={errors.email ? 'error-input' : ''}
               aria-describedby="email-error"
             />
@@ -243,6 +215,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
               value={formData.role}
               onChange={handleChange}
               onBlur={handleBlur}
+              required
               className={errors.role ? 'error-input' : ''}
               aria-describedby="role-error"
             >
@@ -265,6 +238,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
                 id="companyName"
                 name="companyName"
                 value={formData.companyName}
+                required
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={errors.companyName ? 'error-input' : ''}
@@ -295,6 +269,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
               value={formData.rfid}
               onChange={handleChange}
               onBlur={handleBlur}
+              required
               className={errors.rfid ? 'error-input' : ''}
               aria-describedby="rfid-error"
             />
@@ -315,6 +290,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
               value={formData.address}
               onChange={handleChange}
               onBlur={handleBlur}
+              required
               className={errors.address ? 'error-input' : ''}
               aria-describedby="address-error"
             />
@@ -335,6 +311,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
               value={formData.contact}
               onChange={handleChange}
               onBlur={handleBlur}
+              required
               className={errors.contact ? 'error-input' : ''}
               aria-describedby="contact-error"
             />
@@ -355,6 +332,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
               value={formData.dateOfBirth}
               onChange={handleChange}
               onBlur={handleBlur}
+              required
               className={errors.dateOfBirth ? 'error-input' : ''}
               aria-describedby="dateOfBirth-error"
             />
@@ -374,6 +352,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
               value={formData.gender}
               onChange={handleChange}
               onBlur={handleBlur}
+              required
               className={errors.gender ? 'error-input' : ''}
               aria-describedby="gender-error"
             >
@@ -398,6 +377,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
               value={formData.hireDate}
               onChange={handleChange}
               onBlur={handleBlur}
+              required
               className={errors.hireDate ? 'error-input' : ''}
               aria-describedby="hireDate-error"
             />
@@ -418,6 +398,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
               value={formData.salary}
               onChange={handleChange}
               onBlur={handleBlur}
+              required
               className={errors.salary ? 'error-input' : ''}
               aria-describedby="salary-error"
             />
@@ -439,6 +420,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
                 value={formData.annualLeaveBalance}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                required
                 className={errors.annualLeaveBalance ? 'error-input' : ''}
                 aria-describedby="annualLeaveBalance-error"
               />
@@ -461,6 +443,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
                 value={formData.sickLeaveBalance}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                required
                 className={errors.sickLeaveBalance ? 'error-input' : ''}
                 aria-describedby="sickLeaveBalance-error"
               />
@@ -483,6 +466,7 @@ const UserForm = ({ initialValues, onSubmit, mode, onClose, errorMessage, setErr
                 value={formData.managerId}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                required
                 className={errors.managerId ? 'error-input' : ''}
                 aria-describedby="managerId-error"
               />

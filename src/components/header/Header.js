@@ -1,13 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./Header.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faSearch, faTimes, faCheck, faExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faSearch, faTimes, faCheck, faExclamation, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import Logo from "../../assets/logo2.png";
-const Header = () => {
+
+const Header = ({ setActiveSection }) => {
   const [notifications, setNotifications] = useState([]);
-  const [userInitials, setUserInitials] = useState("");
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [userProfile, setUserProfile] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfilePopup, setShowProfilePopup] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const ws = useRef(null);
+  const navigate = useRef(null);
 
   // Fetch user profile
   useEffect(() => {
@@ -20,7 +25,7 @@ const Header = () => {
         if (!response.ok) throw new Error("Failed to fetch profile");
 
         const data = await response.json();
-        setUserInitials(data.initials || "?");
+        setUserProfile(data);
         localStorage.setItem("userId", data.userId);
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -29,44 +34,52 @@ const Header = () => {
     fetchUserProfile();
   }, []);
 
-  // Setup WebSocket connection
+  // Setup WebSocket connection after userId is available
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    const userRole = localStorage.getItem("userRole");
+    const interval = setInterval(() => {
+      const userId = localStorage.getItem("userId");
+      const userRole = localStorage.getItem("userRole");
 
-    ws.current = new WebSocket(`ws://localhost:8091/?userId=${userId}&role=${userRole}`);
+      if (userId && userRole) {
+        clearInterval(interval);
+        ws.current = new WebSocket(`ws://localhost:8091/?userId=${userId}&role=${userRole}`);
 
-    ws.current.onopen = () => {
-      console.log("WebSocket connected");
-    };
+        ws.current.onopen = () => {
+          console.log("WebSocket connected");
+        };
 
-    ws.current.onmessage = (event) => {
-      try {
-        const parsed = JSON.parse(event.data);
-        const formatted = parsed.map((n) => ({
-          ...n,
-          createdAt: convertArrayToDate(n.createdAt),
-          isRead: false,
-        }));
-        setNotifications((prev) => {
-          const existingIds = new Set(prev.map((n) => n.id));
-          const newNotifications = formatted.filter((n) => !existingIds.has(n.id));
-          return [...newNotifications, ...prev];
-        });
-      } catch (e) {
-        console.error("Invalid notification format", e);
+        ws.current.onmessage = (event) => {
+          try {
+            const parsed = JSON.parse(event.data);
+            const formatted = parsed.map((n) => ({
+              ...n,
+              createdAt: convertArrayToDate(n.createdAt),
+              isRead: n.read === true ? true : false,
+            }));
+            console.log(event.data);
+            setNotifications((prev) => {
+              const existingIds = new Set(prev.map((n) => n.id));
+              const newNotifications = formatted.filter((n) => !existingIds.has(n.id));
+              return [...newNotifications, ...prev];
+            });
+            setNotificationCount(formatted.filter((n) => !n.isRead).length);
+          
+          } catch (e) {
+            console.error("Invalid notification format", e);
+          }
+        };
+
+        ws.current.onclose = () => console.log("WebSocket closed");
+        ws.current.onerror = (e) => console.error("WebSocket error", e);
       }
-    };
-
-    ws.current.onclose = () => console.log("WebSocket closed");
-    ws.current.onerror = (e) => console.error("WebSocket error", e);
+    }, 500);
 
     return () => {
+      clearInterval(interval);
       if (ws.current) ws.current.close();
     };
   }, []);
 
-  // Convert Java array to JS Date
   const convertArrayToDate = (arr) => {
     if (!Array.isArray(arr)) return new Date();
     const [year, month, day, hour = 0, minute = 0, second = 0, nano = 0] = arr;
@@ -75,16 +88,69 @@ const Header = () => {
 
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
+    if (showProfilePopup) setShowProfilePopup(false);
   };
 
-  const markAsRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-    );
+  const toggleProfilePopup = () => {
+    setShowProfilePopup(!showProfilePopup);
+    if (showNotifications) setShowNotifications(false);
   };
 
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+  const markAsRead = async (id) => {
+    try {
+      const userId = localStorage.getItem("userId");
+      const token = localStorage.getItem("authToken");
+      
+      const response = await fetch(
+        `/api/v1/notification/mark-as-read/${userId}/${id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to mark notification as read");
+      }
+
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      );
+      setNotificationCount((prev) => prev - 1);
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      const userRole = localStorage.getItem("userRole");
+      const token = localStorage.getItem("authToken");
+      
+      const response = await fetch(
+        `/api/v1/notification/mark-all-as-read/${userId}/${userRole}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to mark all notifications as read");
+      }
+
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setNotificationCount(0);
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+    }
   };
 
   const getNotificationIcon = (type) => {
@@ -112,16 +178,57 @@ const Header = () => {
     return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
   };
 
+  const handleNotificationClick = (notification) => {
+    if (setActiveSection) {
+      setActiveSection('request');
+      if (!notification.isRead) {
+        markAsRead(notification.id);
+      }
+      setShowNotifications(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    
+    try {
+      const token = localStorage.getItem('authToken');
+      
+      if (token) {
+        await fetch('/api/v1/auth/logout', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+      }
+
+      localStorage.clear();
+      window.location.href = '/login';
+      
+    } catch (error) {
+      console.error('Error logging out:', error);
+      localStorage.clear();
+      window.location.href = '/login';
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (e) => {
-      const container = document.querySelector(".notification-container");
-      if (showNotifications && container && !container.contains(e.target)) {
+      const notificationContainer = document.querySelector(".notification-container");
+      const profileContainer = document.querySelector(".profile-container");
+      
+      if (showNotifications && notificationContainer && !notificationContainer.contains(e.target)) {
         setShowNotifications(false);
+      }
+      if (showProfilePopup && profileContainer && !profileContainer.contains(e.target)) {
+        setShowProfilePopup(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showNotifications]);
+  }, [showNotifications, showProfilePopup]);
 
   return (
     <div className="header-container">
@@ -131,22 +238,13 @@ const Header = () => {
           <h1 className="header-company-name">Flourish HR Automation</h1>
         </div>
 
-        {/* <div className="header-search-container">
-          <div className="header-search-box">
-            <input type="text" placeholder="Search..." className="header-search-input" />
-            <button className="header-search-btn">
-              <FontAwesomeIcon icon={faSearch} />
-            </button>
-          </div>
-        </div> */}
-
         <div className="header-right-section">
           <div className="notification-container">
             <div className="header-notification-icon" onClick={toggleNotifications}>
               <FontAwesomeIcon icon={faBell} />
-              {notifications.some((n) => !n.isRead) && (
+              {notificationCount > 0 && (
                 <span className="notification-count">
-                  {notifications.filter((n) => !n.isRead).length}
+                  {notificationCount}
                 </span>
               )}
             </div>
@@ -158,7 +256,7 @@ const Header = () => {
                   <button
                     className="mark-all-read"
                     onClick={markAllAsRead}
-                    disabled={notifications.every((n) => n.isRead)}
+                    disabled={notifications.every((n) => n.isRead) || notifications.length === 0}
                   >
                     Mark all as read
                   </button>
@@ -170,14 +268,24 @@ const Header = () => {
                   <div className="notification-list-container">
                     <div className="notification-list">
                       {notifications.map((n) => (
-                        <div key={n.id} className={`notification-item ${n.isRead ? "read" : "unread"}`}>
+                        <div 
+                          key={n.id} 
+                          className={`notification-item ${n.isRead ? "read" : "unread"}`} 
+                          onClick={() => handleNotificationClick(n)}
+                        >
                           <div className="notification-icon-container">{getNotificationIcon(n.type)}</div>
                           <div className="notification-content">
                             <p className="notification-message">{n.message}</p>
                             <small className="notification-time">{formatNotificationTime(n.createdAt)}</small>
                           </div>
                           {!n.isRead && (
-                            <button className="mark-as-read" onClick={() => markAsRead(n.id)}>
+                            <button 
+                              className="mark-as-read" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                markAsRead(n.id);
+                              }}
+                            >
                               <FontAwesomeIcon icon={faTimes} />
                             </button>
                           )}
@@ -190,8 +298,39 @@ const Header = () => {
             )}
           </div>
 
-          <div className="user-initials-circle">{userInitials}</div>
+          <div className="profile-container">
+            <div 
+              className="user-initials-circle" 
+              onClick={toggleProfilePopup}
+            >
+              {userProfile?.initials || "?"}
+            </div>
+
+            {showProfilePopup && userProfile && (
+              <div className="profile-popup">
+                <div className="profile-info">
+                  <div className="profile-name">{userProfile.fullName}</div>
+                  <div className="profile-email">{userProfile.email}</div>
+                </div>
+                <div className="profile-divider"></div>
+                <button 
+                  className="logout-btn"
+                  onClick={handleLogout}
+                >
+                  <FontAwesomeIcon icon={faSignOutAlt} className="logout-icon" />
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+
+        {isLoggingOut && (
+          <div className="logout-overlay">
+            <div className="logout-spinner"></div>
+            <div className="logout-message">Logging out...</div>
+          </div>
+        )}
       </header>
     </div>
   );

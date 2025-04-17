@@ -150,7 +150,7 @@ const Salary = () => {
   // Handle generating a report for an individual salary
   const handleGenerateReport = async (salaryId) => {
     try {
-      const response = await axios.get(`/api/v1/salaries/${salaryId}/report`, {
+      const response = await axios.get(`/api/v1/salaries/generate/${salaryId}/report`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

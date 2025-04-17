@@ -71,7 +71,7 @@ const ForgotPassword = () => {
               <Button
                 type="submit"
                 label={loading ? "Sending..." : "Send Reset Link"}
-                className="btn-primary"
+                className="reset-link-btn"
                 disabled={loading}
               />
             </form>

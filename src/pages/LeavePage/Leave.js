@@ -83,9 +83,15 @@ const Leave = () => {
 
     try {
       const response = await axios.get('/api/v1/user/manager/leave-balances', {
+        params:{
+          page,
+          size,
+        },
         headers: { Authorization: `Bearer ${token}` },
       });
       setManagerData(response.data);
+      setTotalPages(response.data.totalPages)
+      setTotalElements(response.data.totalElements);
     } catch (error) {
       console.error('Error fetching manager leave data:', error.response ? error.response.data : error.message);
       setError('Failed to fetch manager leave data. Please try again.');
@@ -125,6 +131,19 @@ const Leave = () => {
     }
   };
 
+   // Handle name filter change
+   const handleNameFilterChange = (e) => {
+    setNameFilter(e.target.value);
+    setPage(0); 
+  };
+
+  // Handle Enter key press for search
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      fetchEmployees();
+    }
+  };
+
  // Admin view components
 const AdminLeaveView = () => (
   <>
@@ -135,14 +154,11 @@ const AdminLeaveView = () => (
       <div className="filter-item">
         <input
           type="text"
+          placeholder="Search by Name"
           value={nameFilter}
-          onChange={(e) => {
-            setNameFilter(e.target.value);
-            setPage(0);
-          }}
-          placeholder="Search by Employee Name"
-          onKeyPress={(e) => e.key === 'Enter' && fetchEmployees()}
-        />
+          onChange={handleNameFilterChange}
+          onKeyPress={handleKeyPress}
+              />
         <FaSearch />
       </div>
       <button onClick={fetchEmployees}>Apply Filters</button>
@@ -444,6 +460,19 @@ const ManagerLeaveView = () => (
                   ))}
                 </tbody>
               </table>
+
+               {/* Pagination Controls */}
+              <div className="pagination-controls">
+                <button onClick={handlePreviousPage} disabled={page === 0}>
+                  Previous
+                </button>
+                <span>
+                  Page {page + 1} of {totalPages} (Total Employees: {totalElements})
+                </span>
+                <button onClick={handleNextPage} disabled={page === totalPages - 1}>
+                  Next
+                </button>
+              </div>        
             </div>
           ) : (
             <p className="no-team-members">No team members assigned.</p>

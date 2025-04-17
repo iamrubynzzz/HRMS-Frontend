@@ -52,7 +52,7 @@ const ManagerSalary = () => {
   // Handle generating a report for an individual salary
   const handleGenerateReport = async (salaryId) => {
     try {
-      const response = await axios.get(`/api/v1/salaries/${salaryId}/report`, {
+      const response = await axios.get(`/api/v1/salaries/generate/${salaryId}/report`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -113,7 +113,7 @@ const ManagerSalary = () => {
   // Fetch payroll on component mount and when filters change
   useEffect(() => {
     fetchManagerPayroll();
-  }, [page, size, sortBy, sortDir]);
+  }, [employeeName, page, size, sortBy, sortDir]);
 
   return (
     <div className="salary-page">
@@ -124,7 +124,7 @@ const ManagerSalary = () => {
         <div className="filter-item">
           <input
             type="text"
-            placeholder="Search by Employee Name"
+            placeholder="Search by Name"
             value={employeeName}
             onChange={(e) => setEmployeeName(e.target.value)}
             onKeyPress={handleKeyPress}

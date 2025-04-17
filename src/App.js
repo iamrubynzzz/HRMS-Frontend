@@ -8,14 +8,20 @@ import ResetPassword from "./pages/ForgotPassword/ResetPassword ";
 import Settings from "./pages/Settings/Settings";
 import { GoogleOAuthProvider } from '@react-oauth/google'; 
 import ProtectedRoute from './routes/ProtectedRoute'; 
+import RequestPage from "./pages/Request/RequestPage";
+import Header from "./components/header/Header";
+import Sidebar from "./components/Sidebar/Sidebar";
+import LandingPage from './pages/LandingPage/LandingPage'
+
 
 const App = () => {
   return (
     <GoogleOAuthProvider clientId="777107196271-smequh3mvjhb5m7ttkovqcepdqau55i8.apps.googleusercontent.com">
       <Router>
         <Routes>
+        <Route path="/" element={<LandingPage/>} />
           {/* Route for the homepage */}
-          <Route path="/" element={<h1>Welcome to the Home Page</h1>} />
+          <Route path="/landingpage" element={<LandingPage/>} />
           
           {/* Route for the login page */}
           <Route path="/login" element={<LoginPage />} />
@@ -31,7 +37,7 @@ const App = () => {
           />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-
+          
           <Route
             path="/settings"
             element={
@@ -40,7 +46,17 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/request"
+            element={
+              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'EMPLOYEE']}>
+                <RequestPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
+        
       </Router>
     </GoogleOAuthProvider>
   );
