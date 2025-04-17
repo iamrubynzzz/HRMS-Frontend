@@ -4,6 +4,7 @@ import Header from '../../components/header/Header';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import AttendancePage from '../../pages/AttendancePage/Attendance';
 import UserPage from '../../pages/UserManagement/Users';
+import CompanyPage from '../../pages/CompanyPage/Company'
 import RequestPage from '../Request/RequestPage';
 import LeavePage from '../LeavePage/Leave';
 import SalaryPage from '../SalaryPage/FullSalaryPage';
@@ -11,7 +12,12 @@ import Settings from '../Settings/Settings';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
-  const [activeSection, setActiveSection] = useState('dashboard');
+  const userRole = localStorage.getItem('userRole');
+  const isManager = userRole.toLowerCase() === 'manager';
+  // Set default section based on role
+  const [activeSection, setActiveSection] = useState(
+    userRole === 'SUPER_ADMIN' ? 'company' : 'dashboard'
+  );
   const [employeeStats, setEmployeeStats] = useState({
     totalEmployees: 0,
     totalMale: 0,
@@ -78,37 +84,33 @@ const AdminDashboard = () => {
     }
   };
 
-  // Fetch data only once when the component mounts
   useEffect(() => {
     fetchEmployeeStats();
     fetchAttendanceStats();
     fetchSalaryOverview();
   }, [token]);
 
-  // Format data for the pie chart
   const pieChartData = [
     { name: 'Present', value: attendanceStats.Present },
     { name: 'Absent', value: attendanceStats.Absent },
     { name: 'Leave', value: attendanceStats.Leave },
   ];
 
-  // Format data for the bar graph
   const barGraphData = [
     { name: 'Released Salaries', amount: salaryOverview.totalSalaries },
     { name: 'Pending Payments', amount: salaryOverview.pendingPayments },
     { name: 'Deductions', amount: salaryOverview.totalDeductions },
   ];
 
-  // Colors for the pie chart
   const COLORS = ['#7F9A49', '#9E403E', '#406A9C'];
 
   return (
     <div className="admin-dashboard">
-      <Header />
+      <Header setActiveSection={setActiveSection} />
       <div className="main-content">
         <Sidebar setActiveSection={setActiveSection} />
         <div className="content">
-          {activeSection === 'dashboard' && (
+          {activeSection === 'dashboard' && userRole !== 'SUPER_ADMIN' && (
             <>
               <div className="stats-cards">
                 <StatCard label="Total Employees" value={employeeStats.totalEmployees} />
@@ -157,11 +159,13 @@ const AdminDashboard = () => {
               </div>
             </>
           )}
-          {activeSection === 'byDate' && <AttendancePage activeSubSection="byDate" />}
-          {activeSection === 'byRange' && <AttendancePage activeSubSection="byRange" />}
-          {activeSection === 'byStatus' && <AttendancePage activeSubSection="byStatus" />}
+          
+          {activeSection === 'attendance' && <AttendancePage />}
           {activeSection === 'users' && <UserPage />}
-          {activeSection === 'request' && <RequestPage />}
+          {activeSection === 'company' && <CompanyPage />}
+          {activeSection === 'my-request' && <RequestPage viewType="my-requests" />}
+          {activeSection === 'teams-request' && <RequestPage viewType="manager-requests" />}
+          {activeSection === 'request' && !isManager && <RequestPage viewType="my-requests" />}
           {activeSection === 'leave' && <LeavePage />}
           {activeSection === 'payroll' && <SalaryPage />}
           {activeSection === 'settings' && <Settings />}

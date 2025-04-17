@@ -8,9 +8,10 @@ import Confirmation from '../../components/ConfirmationModal/Confirmation';
 import SuccessModal from '../../components/SuccessModal/SuccessMessage';
 import './RequestPage.css';
 
-const RequestPage = () => {
+const RequestPage = ({ viewType = 'my-requests' }) => {
   const [requests, setRequests] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isManager, setIsManager] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [userId, setUserId] = useState(null);
   const [formData, setFormData] = useState({
@@ -68,28 +69,29 @@ const RequestPage = () => {
       const token = localStorage.getItem('authToken');
       const userRole = localStorage.getItem('userRole');
 
-      let response;
+      let endpoint;
+      let params = {
+        page,
+        size,
+        sort,
+        status: statusFilter,
+        date: dateFilter,
+      };
+
       if (userRole === 'admin') {
-        response = await axios.get(`/api/requests/all-requests`, {
-          params: {
-            page,
-            size,
-            sort,
-            status: statusFilter,
-            date: dateFilter,
-            employeeName: employeeNameFilter,
-          },
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        endpoint = '/api/requests/all-requests';
+        params.employeeName = employeeNameFilter;
+      } else if (viewType === 'manager-requests' && userRole === 'manager') {
+        endpoint = '/api/requests/manager-requests';
+        params.employeeName = employeeNameFilter;
       } else {
-        // For the employee view of request page
-        response = await axios.get(
-          `/api/requests/my-requests?page=${page}&size=${size}&sort=${sort}&status=${statusFilter}&date=${dateFilter}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        endpoint = '/api/requests/my-requests';
       }
+
+      const response = await axios.get(endpoint, {
+        params,
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       setRequests(response.data.content);
       setTotalPages(response.data.totalPages);
@@ -103,9 +105,10 @@ const RequestPage = () => {
   useEffect(() => {
     const userRole = localStorage.getItem('userRole');
     setIsAdmin(userRole === 'admin');
+    setIsManager(userRole === 'manager');
     fetchUserId();
     fetchRequests();
-  }, [page, size]);
+  }, [page, size,viewType]);
 
   // Handle input change for the form
   const handleInputChange = (e) => {
@@ -165,6 +168,11 @@ const RequestPage = () => {
           setErrors((prev) => ({ ...prev, reason: backendError }));
         } else if (backendError.includes('Overtime hours')) {
           setErrors((prev) => ({ ...prev, overtimeHours: backendError }));
+        }  else if (
+          backendError.includes('Insufficient paid sick leave balance') ||
+          backendError.includes('Insufficient paid annual leave balance')
+        ) {
+          setErrors((prev) => ({ ...prev, startDate: backendError, endDate: backendError }));
         } else {
           // For general errors, show a toast
           toast.error(backendError);
@@ -174,6 +182,7 @@ const RequestPage = () => {
         toast.error(error.message || 'An error occurred while creating the request.');
       }
     }
+      
   };
 
   // Handle cancel request click
@@ -300,10 +309,25 @@ const RequestPage = () => {
     }
   };
 
+  const getTitle = () => {
+    if (isAdmin) return 'All Requests';
+    if (viewType === 'manager-requests') return 'Teams Requests';
+    return 'My Requests';
+  };
+
+  const showActionButtons = (request) => {
+    if (request.status !== 'PENDING') return false;
+    if (isAdmin) return true;
+    if (isManager && viewType === 'manager-requests') return true;
+    if (!isAdmin && !isManager) return false;
+    return false;
+  };
+
   return (
     <div className="request-page">
-      <h2>{isAdmin ? 'All Requests' : 'My Requests'}</h2>
-      {!isAdmin && (
+      <h2>{getTitle()}</h2>
+      {/* Only show create button for personal requests */}
+      {!isAdmin && viewType !== 'manager-requests' && (
         <div className="request-header">
           <button className="create-request-btn" onClick={() => setShowForm(true)}>
             Create Request
@@ -336,6 +360,17 @@ const RequestPage = () => {
   )}
 
   <div className="filter-item">
+    <input
+      type="date"
+      value={dateFilter}
+      onChange={(e) => setDateFilter(e.target.value)}
+      placeholder="Filter by Date"
+      onKeyPress={handleKeyPress}
+    />
+    <FaCalendarAlt />
+  </div>
+
+  <div className="filter-item">
     <select
       value={statusFilter}
       onChange={(e) => setStatusFilter(e.target.value)}
@@ -346,17 +381,6 @@ const RequestPage = () => {
       <option value="PENDING">Pending</option>
       <option value="REJECTED">Rejected</option>
     </select>
-  </div>
-
-  <div className="filter-item">
-    <input
-      type="date"
-      value={dateFilter}
-      onChange={(e) => setDateFilter(e.target.value)}
-      placeholder="Filter by Date"
-      onKeyPress={handleKeyPress}
-    />
-    <FaCalendarAlt />
   </div>
 
   <button onClick={fetchRequests}>Apply Filters</button>
@@ -390,7 +414,7 @@ const RequestPage = () => {
               <td>{request.requestType === 'OVERTIME' ? request.overtimeHours : '-'}</td>
               <td>{request.status}</td>
               <td>
-                {request.status === 'PENDING' && isAdmin && (
+                {request.status === 'PENDING' && showActionButtons(request) && (
                   <>
                     <button
                       className="approve-request-btn"
@@ -406,7 +430,7 @@ const RequestPage = () => {
                     </button>
                   </>
                 )}
-                {request.status === 'PENDING' && !isAdmin && (
+                {request.status === 'PENDING' && viewType === 'my-requests' && !isAdmin && (
                   <button
                     className="cancel-request-btn"
                     onClick={() => handleCancelClick(request.id)}

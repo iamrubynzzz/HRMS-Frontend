@@ -25,7 +25,7 @@ const RequestForm = ({ formData, handleInputChange, handleSubmit, setShowForm, e
               <option value="PAID_ANNUAL_LEAVE">Paid Annual Leave</option>
               <option value="MISSED_ATTENDANCE">Missed Attendance</option>
             </select>
-            {errors.requestType && <p className="error-message">{errors.requestType}</p>}
+            {errors.requestType && <p className="request-error-message">{errors.requestType}</p>}
           </div>
 
           {(formData.requestType === 'MISSED_ATTENDANCE' ||
@@ -38,13 +38,13 @@ const RequestForm = ({ formData, handleInputChange, handleSubmit, setShowForm, e
               <div className="form-group">
                 <label>Start Date</label>
                 <input type="date" name="startDate" value={formData.startDate} onChange={handleInputChange} required />
-                {errors.startDate && <p className="error-message">{errors.startDate}</p>}
+                {errors.startDate && <p className="request-error-message">{errors.startDate}</p>}
               </div>
 
               <div className="form-group">
                 <label>End Date</label>
                 <input type="date" name="endDate" value={formData.endDate} onChange={handleInputChange} required />
-                {errors.endDate && <p className="error-message">{errors.endDate}</p>}
+                {errors.endDate && <p className="request-error-message">{errors.endDate}</p>}
               </div>
             </>
           )}
@@ -52,14 +52,14 @@ const RequestForm = ({ formData, handleInputChange, handleSubmit, setShowForm, e
           <div className="form-group">
             <label>Reason</label>
             <input type="text" name="reason" value={formData.reason} onChange={handleInputChange} required />
-            {errors.reason && <p className="error-message">{errors.reason}</p>}
+            {errors.reason && <p className="request-error-message">{errors.reason}</p>}
           </div>
 
           {formData.requestType === 'ALLOWANCE' && (
             <div className="form-group">
               <label>Allowance Amount</label>
               <input type="number" name="allowanceAmount" value={formData.allowanceAmount} onChange={handleInputChange} required />
-              {errors.allowanceAmount && <p className="error-message">{errors.allowanceAmount}</p>}
+              {errors.allowanceAmount && <p className="request-error-message">{errors.allowanceAmount}</p>}
             </div>
           )}
 
@@ -67,7 +67,7 @@ const RequestForm = ({ formData, handleInputChange, handleSubmit, setShowForm, e
             <div className="form-group">
               <label>Overtime Hours</label>
               <input type="number" name="overtimeHours" value={formData.overtimeHours} onChange={handleInputChange} required />
-              {errors.overtimeHours && <p className="error-message">{errors.overtimeHours}</p>}
+              {errors.overtimeHours && <p className="request-error-message">{errors.overtimeHours}</p>}
             </div>
           )}
 

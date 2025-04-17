@@ -50,7 +50,7 @@ const EmployeeSalary = () => {
   // Handle generating a report for an individual salary
   const handleGenerateReport = async (salaryId) => {
     try {
-      const response = await axios.get(`/api/v1/salaries/${salaryId}/report`, {
+      const response = await axios.get(`/api/v1/salaries/generate/${salaryId}/report`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -152,6 +152,9 @@ const EmployeeSalary = () => {
           <table>
             <thead>
               <tr>
+              <th onClick={() => handleSort('employeeName')}>
+                    Employee Name {sortBy === 'employeeName' && (sortDir === 'asc' ? '↑' : '↓')}
+                  </th>
                 <th onClick={() => handleSort('grossSalary')}>
                   Gross Salary {sortBy === 'grossSalary' && (sortDir === 'asc' ? '↑' : '↓')}
                 </th>
@@ -171,6 +174,7 @@ const EmployeeSalary = () => {
             <tbody>
               {salaries.map((salary) => (
                 <tr key={salary.id}>
+                  <td>{salary.employeeName}</td>
                   <td>{salary.grossSalary}</td>
                   <td>{salary.taxDeduction}</td>
                   <td>{salary.overtimePayTotal}</td>

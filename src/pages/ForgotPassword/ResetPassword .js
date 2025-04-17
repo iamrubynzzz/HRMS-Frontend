@@ -98,7 +98,7 @@ const ResetPassword = () => {
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
-            <div className="form-group">
+            <div className="reset-form-group">
               <label htmlFor="newPassword">New Password</label>
               <div className="input-container">
                 <input
@@ -114,7 +114,7 @@ const ResetPassword = () => {
               </div>
             </div>
             
-            <div className="form-group">
+            <div className="reset-form-group">
               <label htmlFor="confirmPassword">Confirm Password</label>
               <div className="input-container">
                 <input
@@ -136,7 +136,7 @@ const ResetPassword = () => {
             <Button
               type="submit"
               label={loading ? "Resetting..." : "Reset Password"}
-              className="btn-primary"
+              className="reset-link-btn"
               disabled={loading || !!passwordError}
             />
           </form>

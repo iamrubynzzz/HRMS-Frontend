@@ -153,7 +153,7 @@ tr:hover {
   background-color: darkred;
 }
 
-.form-overlay {
+/* .form-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -217,7 +217,7 @@ tr:hover {
 .form-actions button[type='button'] {
   background-color: #dc3545;
   color: white;
-}
+} */
 
 .request-table th:nth-child(1),
 .request-table td:nth-child(1) {

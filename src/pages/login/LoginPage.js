@@ -15,26 +15,10 @@ const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: "",
     companyName: "",
   });
   const [loading, setLoading] = useState(false);
-  const [companies, setCompanies] = useState([]);
   const navigate = useNavigate();
-
-  // Fetch companies on component mount
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const response = await axios.get("/api/companies");
-        setCompanies(response.data);
-      } catch (error) {
-        console.error("Failed to fetch companies:", error);
-      }
-    };
-
-    fetchCompanies();
-  }, []);
 
   // handleChange function
   const handleChange = (e) => {
@@ -48,19 +32,13 @@ const LoginPage = () => {
   const handleLogin = async () => {
     toast.dismiss();
 
-    if (!formData.email || !formData.password || !formData.role) {
-      toast.error("Please fill in all fields, including selecting your role.", {
+    if (!formData.email || !formData.password ) {
+      toast.error("Please fill in all fields.", {
         className: 'custom-toast-error',
       });
       return;
     }
 
-    if (formData.role !== "SUPER_ADMIN" && !formData.companyName) {
-      toast.error("Company name is required for login.", {
-        className: 'custom-toast-error',
-      });
-      return;
-    }
 
     setLoading(true);
 
@@ -73,9 +51,10 @@ const LoginPage = () => {
 
       if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
-        localStorage.setItem("userRole", formData.role);
+        localStorage.setItem("refreshToken", response.data.refreshToken);
+        localStorage.setItem("userRole", response.data.role); 
         navigate('/admin-dashboard');
-      }
+      }      
     } catch (error) {
       console.error("Login failed:", error);
 
@@ -179,7 +158,7 @@ const LoginPage = () => {
         <div className="login-form">
           <h1>Login</h1>
           <p>Welcome back, please enter your details</p>
-          <div className="form-group">
+          <div className="login-form-group">
             <label htmlFor="email">Email</label>
             <div className="input-container">
               <input
@@ -193,7 +172,7 @@ const LoginPage = () => {
               <FontAwesomeIcon icon="envelope" className="input-icon" />
             </div>
           </div>
-          <div className="form-group">
+          <div className="login-form-group">
             <label htmlFor="password">Password</label>
             <div className="input-container">
               <input
@@ -207,45 +186,6 @@ const LoginPage = () => {
               <span className="eye-toggle">{ToggleIcon}</span>
             </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="role">Role</label>
-            <div className="role-select-container">
-              <select
-                id="role"
-                name="role"
-                className="role-select"
-                value={formData.role}
-                onChange={handleChange}
-              >
-                <option value="" disabled>Select your role</option>
-                <option value="SUPER_ADMIN">Super Admin</option>
-                <option value="admin">Admin</option>
-                <option value="manager">Manager</option>
-                <option value="employee">Employee</option>
-              </select>
-            </div>
-          </div>
-          {formData.role !== "SUPER_ADMIN" && (
-            <div className="form-group">
-              <label htmlFor="companyName">Company</label>
-              <div className="role-select-container">
-                <select
-                  id="companyName"
-                  name="companyName"
-                  className="role-select"
-                  value={formData.companyName}
-                  onChange={handleChange}
-                >
-                  <option value="" disabled>Select your company</option>
-                  {companies.map((company) => (
-                    <option key={company.id} value={company.name.trim()}>
-                      {company.name.trim()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          )}
           <div className="form-footer">
             <Link to="/forgot-password" className="forgot-password">Forgot Password?</Link>
           </div>
