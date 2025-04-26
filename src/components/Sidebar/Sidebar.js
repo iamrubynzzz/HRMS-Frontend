@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaThLarge, FaUsers, FaCalendarCheck, FaFileInvoiceDollar, FaRegCalendarCheck, FaTasks, FaSignOutAlt,FaBuilding  } from 'react-icons/fa';
+import { FaThLarge,FaCog, FaUsers, FaCalendarCheck,FaEnvelope , FaFileInvoiceDollar, FaRegCalendarCheck, FaTasks, FaSignOutAlt,FaBuilding  } from 'react-icons/fa';
 import './Sidebar.css';
 
 const Sidebar = ({ setActiveSection }) => {
@@ -15,7 +15,8 @@ const Sidebar = ({ setActiveSection }) => {
   const userRole = localStorage.getItem('userRole') || 'employee';
   const isSuperAdmin = userRole.toLowerCase() === 'super_admin';
   const isManager = userRole.toLowerCase() === 'manager';
- 
+  const isAdmin = userRole.toLowerCase() === 'admin';
+
   const handleSectionClick = (section) => {
     // Reset all active states first
     setActive(section);
@@ -110,6 +111,15 @@ const Sidebar = ({ setActiveSection }) => {
                 onClick={() => handleSectionClick('users')} 
               />
             )}
+
+          {isAdmin && (
+            <SidebarItem 
+              icon={<FaEnvelope />} 
+              label="Emails" 
+              active={active === 'emails'} 
+              onClick={() => handleSectionClick('emails')} 
+            />
+          )}
             
             <SidebarItem 
               icon={<FaCalendarCheck />} 
@@ -150,7 +160,7 @@ const Sidebar = ({ setActiveSection }) => {
               </div>
             )}
             <SidebarItem 
-              icon={<FaTasks />} 
+              icon={<FaCog />} 
               label="Settings" 
               active={active === 'settings'} 
               onClick={() => handleSectionClick('settings')} 

@@ -4,19 +4,26 @@ import Header from '../../components/header/Header';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import AttendancePage from '../../pages/AttendancePage/Attendance';
 import UserPage from '../../pages/UserManagement/Users';
+import EmailPage from '../../pages/EmailPage/EmailPage'
 import CompanyPage from '../../pages/CompanyPage/Company'
 import RequestPage from '../Request/RequestPage';
 import LeavePage from '../LeavePage/Leave';
 import SalaryPage from '../SalaryPage/FullSalaryPage';
 import Settings from '../Settings/Settings';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const userRole = localStorage.getItem('userRole');
   const isManager = userRole.toLowerCase() === 'manager';
-  // Set default section based on role
-  const [activeSection, setActiveSection] = useState(
-    userRole === 'SUPER_ADMIN' ? 'company' : 'dashboard'
+  const isAdmin = userRole === 'admin';
+  const isSuperAdmin = userRole === 'super_admin';
+  const isEmployee = userRole.toLowerCase() === 'employee';
+
+   // Set default section based on role
+   const [activeSection, setActiveSection] = useState(
+    isSuperAdmin ? 'company' : 'dashboard'
   );
   const [employeeStats, setEmployeeStats] = useState({
     totalEmployees: 0,
@@ -34,10 +41,13 @@ const AdminDashboard = () => {
     totalDeductions: 0,
   });
 
+  const [date, setDate] = useState(new Date());
+
   const token = localStorage.getItem('authToken');
 
-  // Fetch employee stats
+  // Fetch employee stats (not for SUPER_ADMIN)
   const fetchEmployeeStats = async () => {
+    if (isSuperAdmin) return;
     try {
       const response = await fetch('/api/v1/user/stats', {
         headers: {
@@ -52,8 +62,9 @@ const AdminDashboard = () => {
     }
   };
 
-  // Fetch attendance stats
+  // Fetch attendance stats (not for SUPER_ADMIN)
   const fetchAttendanceStats = async () => {
+    if (isSuperAdmin) return;
     try {
       const response = await fetch('/api/attendance/stats/today', {
         headers: {
@@ -68,8 +79,10 @@ const AdminDashboard = () => {
     }
   };
 
-  // Fetch salary overview
+  // Fetch salary overview (only for admin)
   const fetchSalaryOverview = async () => {
+    if (!isAdmin || isSuperAdmin) return;
+    
     try {
       const response = await fetch('/api/v1/salaries/overview', {
         headers: {
@@ -83,6 +96,7 @@ const AdminDashboard = () => {
       console.error('Error fetching salary overview:', error);
     }
   };
+
 
   useEffect(() => {
     fetchEmployeeStats();
@@ -113,9 +127,20 @@ const AdminDashboard = () => {
           {activeSection === 'dashboard' && userRole !== 'SUPER_ADMIN' && (
             <>
               <div className="stats-cards">
-                <StatCard label="Total Employees" value={employeeStats.totalEmployees} />
-                <StatCard label="Total Male" value={employeeStats.totalMale} />
-                <StatCard label="Total Female" value={employeeStats.totalFemale} />
+              {isAdmin && (
+                  <>
+                    <StatCard label="Total Employees" value={employeeStats.totalEmployees} />
+                    <StatCard label="Total Male" value={employeeStats.totalMale} />
+                    <StatCard label="Total Female" value={employeeStats.totalFemale} />
+                  </>
+                )}
+                {(isManager || isEmployee) && (
+                  <>
+                    <StatCard label="Present Today" value={attendanceStats.Present} />
+                    <StatCard label="Absent Today" value={attendanceStats.Absent} />
+                    <StatCard label="On Leave" value={attendanceStats.Leave} />
+                  </>
+                )}
               </div>
               <div className="charts-container">
                 <div className="pie-chart-container">
@@ -141,20 +166,35 @@ const AdminDashboard = () => {
                   </PieChart>
                 </div>
                 <div className="bar-chart-container">
-                  <h3>Salary Overview (in NPR)</h3>
-                  <BarChart
-                    width={500}
-                    height={400}
-                    data={barGraphData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="amount" fill="#8884d8" />
-                  </BarChart>
+                {isAdmin ? (
+                    <>
+                      <h3>Salary Overview (in NPR)</h3>
+                      <BarChart
+                        width={500}
+                        height={400}
+                        data={barGraphData}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="amount" fill="#8884d8" />
+                      </BarChart>
+                    </>
+                  ) : (
+                    <>
+                      <h3>Calendar</h3>
+                      <div className="calendar-container">
+                        <Calendar 
+                          onChange={setDate} 
+                          value={date} 
+                          className="react-calendar"
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </>
@@ -162,6 +202,7 @@ const AdminDashboard = () => {
           
           {activeSection === 'attendance' && <AttendancePage />}
           {activeSection === 'users' && <UserPage />}
+          {activeSection === 'emails' && <EmailPage />}
           {activeSection === 'company' && <CompanyPage />}
           {activeSection === 'my-request' && <RequestPage viewType="my-requests" />}
           {activeSection === 'teams-request' && <RequestPage viewType="manager-requests" />}

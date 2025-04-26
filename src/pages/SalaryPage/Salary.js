@@ -232,6 +232,7 @@ const Salary = () => {
   return (
     <div className="salary-page">
       <ToastContainer />
+      <h2>Employee's Payroll</h2>
       <div className="filters">
         {/* Consolidated Salary Filters */}
         {!selectedConsolidatedSalaryId && (
