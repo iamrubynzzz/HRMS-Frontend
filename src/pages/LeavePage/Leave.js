@@ -156,6 +156,7 @@ const AdminLeaveView = () => (
           type="text"
           placeholder="Search by Name"
           value={nameFilter}
+          autoFocus
           onChange={handleNameFilterChange}
           onKeyPress={handleKeyPress}
               />
